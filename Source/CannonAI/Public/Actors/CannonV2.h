@@ -9,7 +9,7 @@
 /**
  * This version of the cannon includes a base, a turret, and barrel
  */
-UCLASS(meta = (DisplayName = "Cannon V2 Actor"))
+UCLASS(meta = (DisplayName = "Cannon AI V2"))
 class CANNONAI_API ACannonV2 : public ACannon
 {
 	GENERATED_BODY()

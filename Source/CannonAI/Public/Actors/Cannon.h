@@ -14,7 +14,7 @@ class USoundCue;
 /**
  * Cannon AI base class
  */
-UCLASS(Abstract, meta = (DisplayName = "Cannon AI"))
+UCLASS(Abstract, NotBlueprintable, meta = (DisplayName = "Cannon AI"))
 class CANNONAI_API ACannon : public AActor, public IGameplayInterface
 {
 	GENERATED_BODY()
