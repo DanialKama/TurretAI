@@ -44,7 +44,7 @@ ACannonV1::ACannonV1()
 	Detector->PrimaryComponentTick.bStartWithTickEnabled = false;
 	Detector->SetGenerateOverlapEvents(false);	// Enable on the server only
 	Detector->CanCharacterStepUpOn = ECB_No;
-	Detector->SetCollisionProfileName("OverlapOnlyPawn");
+	Detector->SetCollisionProfileName("Trigger");
 	Detector->SetCanEverAffectNavigation(false);
 
 	HealthComp = CreateDefaultSubobject<UHealth>("HealthComponent");
