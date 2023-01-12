@@ -33,11 +33,15 @@ struct FCannonInfo
 	float FireRate;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	float MaxPitch;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	float MinPitch;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	float MaxPitch;
-	
+	float RotationSpeed;
+
+	/** Used for shotgun cannon */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	float AccuracyOffset;
 	
@@ -47,10 +51,11 @@ struct FCannonInfo
 	// Default constructor
 	FCannonInfo()
 	{
-		FireRate = 0.0f;
-		MinPitch = 0.0f;
-		MaxPitch = 0.0f;
-		AccuracyOffset = 0.0f;
+		FireRate = 1.0f;
+		MaxPitch = 45.0f;
+		MinPitch = -45.0f;
+		RotationSpeed = 100.0f;
+		AccuracyOffset = 10.0f;
 		CannonAbility = 0;
 	}
 };

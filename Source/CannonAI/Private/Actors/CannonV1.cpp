@@ -263,14 +263,14 @@ FRotator ACannonV1::CalculateRotation(const UStaticMeshComponent* CompToRotate, 
 {
 	if (CurrentTarget)
 	{
-		// Follow the Target
+		// Follow the target
 		const FVector NewLocation = CurrentTarget->GetActorLocation() - BarrelMesh->GetComponentLocation();
 		const FRotator TargetRotation = FRotationMatrix::MakeFromX(GetActorTransform().InverseTransformVectorNoScale(NewLocation)).Rotator();	// Inverse Transform Direction
-		return FMath::RInterpConstantTo(CompToRotate->GetRelativeRotation(), TargetRotation, DeltaTime, 100.0f);
+		return FMath::RInterpConstantTo(CompToRotate->GetRelativeRotation(), TargetRotation, DeltaTime, CannonInfo.RotationSpeed);
 	}
 	
 	// Perform random rotation
-	return FMath::RInterpConstantTo(CompToRotate->GetRelativeRotation(), RandomRotation, DeltaTime, 100.0f);
+	return FMath::RInterpConstantTo(CompToRotate->GetRelativeRotation(), RandomRotation, DeltaTime, CannonInfo.RotationSpeed);
 }
 
 bool ACannonV1::CanRotateRandomly() const
