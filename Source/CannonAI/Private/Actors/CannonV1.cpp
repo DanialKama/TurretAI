@@ -229,18 +229,15 @@ bool ACannonV1::CanHitTarget(AActor* Target, bool bUseMuzzle) const
 	FCollisionQueryParams QueryParams;
 	QueryParams.AddIgnoredActor(this);	// Ignore self
 
-	// The sphere radius should match the projectile radius.
-	if (GetWorld()->SweepSingleByChannel(HitResult, StartLocation, EndLocation, FQuat::Identity, ECC_Visibility,
+	// NOTE: For better results, the sphere radius should match the projectile radius
+	if (GetWorld()->SweepSingleByChannel(HitResult, StartLocation, EndLocation, FQuat::Identity, ECC_Camera,
 		FCollisionShape::MakeSphere(50.0f), QueryParams))
 	{
 		if (HitResult.GetActor() == Target)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Can Hit!"));
 			return true;
 		}
 	}
-
-	UE_LOG(LogTemp, Warning, TEXT("Can NOT Hit!"));
 	return false;
 }
 
