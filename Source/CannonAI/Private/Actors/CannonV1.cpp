@@ -29,7 +29,6 @@ ACannonV1::ACannonV1()
 	TurretMesh->SetGenerateOverlapEvents(false);
 	TurretMesh->CanCharacterStepUpOn = ECB_No;
 	TurretMesh->SetCanEverAffectNavigation(false);
-	TurretMesh->bUseAttachParentBound = true;
 	
 	BarrelMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Barrel Mesh"));
 	BarrelMesh->SetupAttachment(TurretMesh);
@@ -37,7 +36,6 @@ ACannonV1::ACannonV1()
 	BarrelMesh->SetGenerateOverlapEvents(false);
 	BarrelMesh->CanCharacterStepUpOn = ECB_No;
 	BarrelMesh->SetCanEverAffectNavigation(false);
-	BarrelMesh->bUseAttachParentBound = true;
 
 	Detector = CreateDefaultSubobject<USphereComponent>(TEXT("Detector Collision"));
 	Detector->SetupAttachment(BaseMesh);
@@ -219,7 +217,7 @@ bool ACannonV1::CanHitTarget(AActor* Target, bool bUseMuzzle) const
 	if (bUseMuzzle)
 	{
 		StartLocation = BarrelMesh->GetSocketLocation(FName("ProjectileSocket"));
-		EndLocation = BarrelMesh->GetSocketLocation(FName("ProjectileSocket")) + BarrelMesh->GetForwardVector() * (Detector->GetUnscaledSphereRadius() + 100.0f);
+		EndLocation = StartLocation + BarrelMesh->GetForwardVector() * (Detector->GetUnscaledSphereRadius() + 100.0f);
 	}
 	else
 	{
