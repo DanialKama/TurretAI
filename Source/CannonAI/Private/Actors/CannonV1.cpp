@@ -16,38 +16,38 @@ ACannonV1::ACannonV1()
 	bReplicates = true;
 	NetUpdateFrequency = 5.0f;
 	
-	BaseMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Base Mesh"));
+	BaseMesh = CreateDefaultSubobject<UStaticMeshComponent>("BaseMesh");
 	RootComponent = BaseMesh;
 	BaseMesh->Mobility = EComponentMobility::Static;
 	BaseMesh->bReplicatePhysicsToAutonomousProxy = false;
 	BaseMesh->SetGenerateOverlapEvents(false);
 	BaseMesh->CanCharacterStepUpOn = ECB_No;
 
-	TurretMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Turret Mesh"));
-	TurretMesh->SetupAttachment(BaseMesh, FName("ConnectionSocket"));
+	TurretMesh = CreateDefaultSubobject<UStaticMeshComponent>("TurretMesh");
+	TurretMesh->SetupAttachment(BaseMesh, "ConnectionSocket");
 	TurretMesh->bReplicatePhysicsToAutonomousProxy = false;
 	TurretMesh->SetGenerateOverlapEvents(false);
 	TurretMesh->CanCharacterStepUpOn = ECB_No;
 	TurretMesh->SetCanEverAffectNavigation(false);
 	
-	BarrelMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Barrel Mesh"));
+	BarrelMesh = CreateDefaultSubobject<UStaticMeshComponent>("BarrelMesh");
 	BarrelMesh->SetupAttachment(TurretMesh);
 	BarrelMesh->bReplicatePhysicsToAutonomousProxy = false;
 	BarrelMesh->SetGenerateOverlapEvents(false);
 	BarrelMesh->CanCharacterStepUpOn = ECB_No;
 	BarrelMesh->SetCanEverAffectNavigation(false);
 
-	Detector = CreateDefaultSubobject<USphereComponent>(TEXT("Detector Collision"));
+	Detector = CreateDefaultSubobject<USphereComponent>("DetectorCollision");
 	Detector->SetupAttachment(BaseMesh);
 	Detector->Mobility = EComponentMobility::Static;
 	Detector->SetAreaClassOverride(nullptr);
 	Detector->PrimaryComponentTick.bStartWithTickEnabled = false;
 	Detector->SetGenerateOverlapEvents(false);	// Enable on the server only
 	Detector->CanCharacterStepUpOn = ECB_No;
-	Detector->SetCollisionProfileName(FName("OverlapOnlyPawn"));
+	Detector->SetCollisionProfileName("OverlapOnlyPawn");
 	Detector->SetCanEverAffectNavigation(false);
 
-	HealthComp = CreateDefaultSubobject<UHealth>(TEXT("Health Component"));
+	HealthComp = CreateDefaultSubobject<UHealth>("HealthComponent");
 
 	// Initialize variables
 	bCanRotateRandomly = true;
@@ -185,7 +185,7 @@ void ACannonV1::FireCannon()
 TArray<FRotator> ACannonV1::CalculateProjectileDirection() const
 {
 	TArray<FRotator> OutRotations;
-	const FRotator SocketRotation = BarrelMesh->GetSocketRotation(FName("ProjectileSocket"));
+	const FRotator SocketRotation = BarrelMesh->GetSocketRotation("ProjectileSocket");
 	
 	if (CannonInfo.CannonAbility & static_cast<uint32>(ECannonAbility::Shotgun))
 	{
@@ -216,12 +216,12 @@ bool ACannonV1::CanHitTarget(AActor* Target, bool bUseMuzzle) const
 	
 	if (bUseMuzzle)
 	{
-		StartLocation = BarrelMesh->GetSocketLocation(FName("ProjectileSocket"));
+		StartLocation = BarrelMesh->GetSocketLocation("ProjectileSocket");
 		EndLocation = StartLocation + BarrelMesh->GetForwardVector() * (Detector->GetUnscaledSphereRadius() + 100.0f);
 	}
 	else
 	{
-		StartLocation = BaseMesh->GetSocketLocation(FName("ConnectionSocket"));
+		StartLocation = BaseMesh->GetSocketLocation("ConnectionSocket");
 		EndLocation = Target->GetActorLocation();
 	}
 	
@@ -286,7 +286,7 @@ bool ACannonV1::CanRotateRandomly() const
 void ACannonV1::MulticastFireCannon_Implementation(const TArray<FRotator>& Rotations)
 {
 	FTransform NewTransform;
-	NewTransform.SetLocation(BarrelMesh->GetSocketLocation(FName("ProjectileSocket")));
+	NewTransform.SetLocation(BarrelMesh->GetSocketLocation("ProjectileSocket"));
 
 	// If there is more than 1 projectile to spawn, lower the scale
 	NewTransform.SetScale3D(Rotations.Num() > 1 ? GetActorScale3D() - 1.0f + 0.4f : GetActorScale3D());
@@ -298,7 +298,7 @@ void ACannonV1::MulticastFireCannon_Implementation(const TArray<FRotator>& Rotat
 		SpawnProjectile(NewTransform);
 	}
 
-	NewTransform = BarrelMesh->GetSocketTransform(FName("MuzzleSocket"));
+	NewTransform = BarrelMesh->GetSocketTransform("MuzzleSocket");
 	
 	FFXSystemSpawnParameters SpawnParams;
 	SpawnParams.WorldContextObject = GetWorld();
@@ -361,20 +361,20 @@ void ACannonV1::MulticastDestroyCannon_Implementation()
 	FFXSystemSpawnParameters SpawnParams;
 	SpawnParams.WorldContextObject = GetWorld();
 	SpawnParams.SystemTemplate = DestroyParticle;
-	SpawnParams.Location = BaseMesh->GetSocketLocation(FName("ConnectionSocket"));
+	SpawnParams.Location = BaseMesh->GetSocketLocation("ConnectionSocket");
 	UNiagaraFunctionLibrary::SpawnSystemAtLocationWithParams(SpawnParams);
 	
 	UGameplayStatics::SpawnSoundAtLocation(GetWorld(), DestroySound, GetActorLocation());
 
 	BaseMesh->SetCanEverAffectNavigation(false);
 	BaseMesh->SetMobility(EComponentMobility::Movable);
-	BaseMesh->SetCollisionProfileName(FName("Destructible"));
+	BaseMesh->SetCollisionProfileName("Destructible");
 	BaseMesh->SetSimulatePhysics(true);
 
-	TurretMesh->SetCollisionProfileName(FName("Destructible"));
+	TurretMesh->SetCollisionProfileName("Destructible");
 	TurretMesh->SetSimulatePhysics(true);
 
-	BarrelMesh->SetCollisionProfileName(FName("Destructible"));
+	BarrelMesh->SetCollisionProfileName("Destructible");
 	BarrelMesh->SetSimulatePhysics(true);
 
 	FTimerHandle TimerHandle;

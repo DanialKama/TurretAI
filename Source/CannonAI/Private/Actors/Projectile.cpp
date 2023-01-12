@@ -15,19 +15,19 @@ AProjectile::AProjectile()
 	SetCanBeDamaged(false);
 	InitialLifeSpan = 5.0f;
 
-	ProjectileMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Projectile Mesh"));
+	ProjectileMesh = CreateDefaultSubobject<UStaticMeshComponent>("ProjectileMesh");
 	RootComponent = ProjectileMesh;
 	ProjectileMesh->SetLinearDamping(0.0f);
 	ProjectileMesh->SetGenerateOverlapEvents(false);
 	ProjectileMesh->CanCharacterStepUpOn = ECB_No;
-	ProjectileMesh->SetCollisionProfileName(FName("BlockAllDynamic"));
+	ProjectileMesh->SetCollisionProfileName("BlockAllDynamic");
 	ProjectileMesh->SetNotifyRigidBodyCollision(true);	// Simulation Generates Hit Events
 	ProjectileMesh->SetCanEverAffectNavigation(false);
 
-	TrailParticle = CreateDefaultSubobject<UNiagaraComponent>(TEXT("Trail Particle"));
+	TrailParticle = CreateDefaultSubobject<UNiagaraComponent>("TrailParticle");
 	TrailParticle->SetupAttachment(ProjectileMesh);
 
-	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("Projectile Movement"));
+	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>("ProjectileMovement");
 	
 	// Initialize variables
 	bDoOnceHit = true;
