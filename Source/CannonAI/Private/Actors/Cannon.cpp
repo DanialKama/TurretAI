@@ -24,7 +24,7 @@ ACannon::ACannon()
 	BaseMesh->CanCharacterStepUpOn = ECB_No;
 	
 	BarrelMesh = CreateDefaultSubobject<UStaticMeshComponent>("BarrelMesh");
-	BarrelMesh->SetupAttachment(BaseMesh);
+	BarrelMesh->SetupAttachment(BaseMesh, "ConnectionSocket");
 	BarrelMesh->bReplicatePhysicsToAutonomousProxy = false;
 	BarrelMesh->SetGenerateOverlapEvents(false);
 	BarrelMesh->CanCharacterStepUpOn = ECB_No;
