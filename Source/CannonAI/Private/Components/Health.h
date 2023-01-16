@@ -23,7 +23,7 @@ private:
 
 // Variables
 public:
-	UPROPERTY(EditAnywhere, meta = (ClampMin = "0.0", UIMin = "0.0"))
+	UPROPERTY(EditAnywhere, Category = "Cannon", meta = (ClampMin = "0.0", UIMin = "0.0"))
 	float DefaultHealth = 100.0f;
 
 private:

@@ -24,22 +24,22 @@ struct CANNONAI_API FCannonInfo /*: public FTableRowBase*/
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Cannon")
 	float FireRate;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Cannon")
 	float MaxPitch;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Cannon")
 	float MinPitch;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Cannon")
 	float RotationSpeed;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Cannon")
 	float AccuracyOffset;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (Bitmask, BitmaskEnum = "/Script/CannonAI.ECannonAbility"))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Cannon", meta = (Bitmask, BitmaskEnum = "/Script/CannonAI.ECannonAbility"))
 	int32 CannonAbility;
 
 	FCannonInfo()

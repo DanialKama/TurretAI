@@ -9,6 +9,7 @@
 #include "Net/UnrealNetwork.h"
 #include "NiagaraFunctionLibrary.h"
 #include "Sound/SoundCue.h"
+#include "TimerManager.h"
 
 ACannon::ACannon()
 {
