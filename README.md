@@ -1,1 +1,1 @@
-# CannonAI
+# Turret AI Plugin
