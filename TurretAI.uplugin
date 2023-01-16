@@ -2,12 +2,12 @@
 	"FileVersion": 3,
 	"Version": 1,
 	"VersionName": "1.0",
-	"FriendlyName": "CannonAI",
-	"Description": "Cannon AI",
+	"FriendlyName": "TurretAI",
+	"Description": "A simple turret AI",
 	"Category": "AI",
 	"CreatedBy": "Danial Kamali",
 	"CreatedByURL": "https://github.com/DanialKama",
-	"DocsURL": "https://github.com/DanialKama",
+	"DocsURL": "https://github.com/DanialKama/TurretAI.git",
 	"MarketplaceURL": "",
 	"SupportURL": "https://discord.com/users/810853382193545227",
 	"CanContainContent": true,
@@ -16,7 +16,7 @@
 	"Installed": false,
 	"Modules": [
 		{
-			"Name": "CannonAI",
+			"Name": "TurretAI",
 			"Type": "Runtime",
 			"LoadingPhase": "Default"
 		}
