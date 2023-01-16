@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "Modules/ModuleManager.h"
 
-class FCannonAIModule : public IModuleInterface
+class FTurretAIModule : public IModuleInterface
 {
 public:
 

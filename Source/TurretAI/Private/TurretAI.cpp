@@ -1,15 +1,15 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-#include "CannonAI.h"
+#include "TurretAI.h"
 
-#define LOCTEXT_NAMESPACE "FCannonAIModule"
+#define LOCTEXT_NAMESPACE "FTurretAIModule"
 
-void FCannonAIModule::StartupModule()
+void FTurretAIModule::StartupModule()
 {
 	// This code will execute after your module is loaded into memory; the exact timing is specified in the .uplugin file per-module
 }
 
-void FCannonAIModule::ShutdownModule()
+void FTurretAIModule::ShutdownModule()
 {
 	// This function may be called during shutdown to clean up your module.  For modules that support dynamic reloading,
 	// we call this function before unloading the module.
@@ -17,4 +17,4 @@ void FCannonAIModule::ShutdownModule()
 
 #undef LOCTEXT_NAMESPACE
 	
-IMPLEMENT_MODULE(FCannonAIModule, CannonAI)
+IMPLEMENT_MODULE(FTurretAIModule, TurretAI)

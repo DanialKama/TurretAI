@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Actors/Cannon.h"
-#include "CannonV2.generated.h"
+#include "Actors/Turret.h"
+#include "TurretV2.generated.h"
 
 /**
- * This version of the cannon includes a base, a turret, and barrel
+ * This version of the turret includes a base, a turret, and barrel
  */
-UCLASS(Blueprintable, meta = (DisplayName = "Cannon AI V2"))
-class CANNONAI_API ACannonV2 : public ACannon
+UCLASS(Blueprintable, meta = (DisplayName = "Turret AI V2"))
+class TURRETAI_API ATurretV2 : public ATurret
 {
 	GENERATED_BODY()
 	
@@ -20,13 +20,13 @@ class CANNONAI_API ACannonV2 : public ACannon
 // Functions
 public:
 	/** Sets default values for this actor's properties */
-	ACannonV2();
+	ATurretV2();
 	
 protected:
 	/** Called every frame */
 	virtual void Tick(float DeltaTime) override;
 
-	virtual void MulticastDestroyCannon_Implementation() override;
+	virtual void MulticastDestroyTurret_Implementation() override;
 
 	virtual void StartSink() const override;
 };

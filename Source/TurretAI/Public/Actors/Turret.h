@@ -5,17 +5,17 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Interfaces/GameplayInterface.h"
-#include "Structures/CannonInfo.h"
-#include "Cannon.generated.h"
+#include "Structures/TurretInfo.h"
+#include "Turret.generated.h"
 
 class UNiagaraSystem;
 class USoundCue;
 
 /**
- * Cannon AI base class
+ * Turret AI base class
  */
-UCLASS(Abstract, NotBlueprintable, meta = (DisplayName = "Cannon AI"))
-class CANNONAI_API ACannon : public AActor, public IGameplayInterface
+UCLASS(Abstract, NotBlueprintable, meta = (DisplayName = "Turret AI"))
+class TURRETAI_API ATurret : public AActor, public IGameplayInterface
 {
 	GENERATED_BODY()
 
@@ -36,7 +36,7 @@ private:
 // Functions
 public:
 	/** Sets default values for this actor's properties */
-	ACannon();
+	ATurret();
 
 	// Gameplay Interface
 	virtual void HealthChanged(float NewHealth) override;
@@ -48,10 +48,10 @@ protected:
 	/** Called every frame */
 	virtual void Tick(float DeltaTime) override;
 	
-	/** Calculating the target rotation so the cannon will smoothly rotate toward the target */
+	/** Calculating the target rotation so the turret will smoothly rotate toward the target */
 	FRotator CalculateRotation(const UStaticMeshComponent* CompToRotate, float DeltaTime) const;
 	
-	virtual void MulticastDestroyCannon_Implementation();
+	virtual void MulticastDestroyTurret_Implementation();
 	
 	virtual void StartSink() const;
 
@@ -69,11 +69,11 @@ private:
 	/** Should not be called directly, use FindNewTarget() */
 	void HandleFindNewTarget();
 
-	/** Trying to fire the cannon based on the current state of the target (enemy). */
+	/** Trying to fire the turret based on the current state of the target (enemy). */
 	void StartFire();
 
-	/** Handling firing the cannon */
-	void FireCannon();
+	/** Fire the weapon */
+	void FireWeapon();
 	
 	/**
 	 * Checking the target state and see that can projectile hit the target
@@ -83,60 +83,60 @@ private:
 	 */
 	bool CanHitTarget(AActor* Target, bool bUseMuzzle) const;
 
-	/** Calculating direction for projectiles based on the cannon ability and Accuracy Offset */
+	/** Calculating direction for projectiles based on the turret ability and Accuracy Offset */
 	TArray<FRotator> CalculateProjectileDirection() const;
 	
 	UFUNCTION(NetMulticast, Unreliable)
-	void MulticastFireCannon(const TArray<FRotator>& Rotations);
-	void MulticastFireCannon_Implementation(const TArray<FRotator>& Rotations);
+	void MulticastFireWeapon(const TArray<FRotator>& Rotations);
+	void MulticastFireWeapon_Implementation(const TArray<FRotator>& Rotations);
 
 	void SpawnProjectile(FTransform Transform);
 
-	/** Finding a new random rotation for the cannon to use when there is no enemy */
+	/** Finding a new random rotation for the turret to use when there is no enemy */
 	void FindRandomRotation();
 
 	/** Can calculate random rotation? */
 	bool CanRotateRandomly() const;
 
-	void DestroyCannon();
+	void DestroyTurret();
 	
 	UFUNCTION(NetMulticast, Unreliable)
-	void MulticastDestroyCannon();
+	void MulticastDestroyTurret();
 	
 // Variables
 protected:
-	/** Cannon info structure that stores the essential data to initialize the cannon */
-	UPROPERTY(EditDefaultsOnly, Category = "Cannon")
-	FCannonInfo CannonInfo;
+	/** Turret info structure that stores the essential data to initialize the turret */
+	UPROPERTY(EditDefaultsOnly, Category = "Turret")
+	FTurretInfo TurretInfo;
 
 private:
-	UPROPERTY(EditDefaultsOnly, Category = "Cannon", meta = (AllowPrivateAccess = true))
+	UPROPERTY(EditDefaultsOnly, Category = "Turret", meta = (AllowPrivateAccess = true))
 	TSubclassOf<class AProjectile> Projectile;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Cannon", meta = (AllowPrivateAccess = true))
+	UPROPERTY(EditDefaultsOnly, Category = "Turret", meta = (AllowPrivateAccess = true))
 	TObjectPtr<UNiagaraSystem> FireParticle;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Cannon", meta = (AllowPrivateAccess = true))
+	UPROPERTY(EditDefaultsOnly, Category = "Turret", meta = (AllowPrivateAccess = true))
 	TObjectPtr<USoundCue> FireSound;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Cannon", meta = (AllowPrivateAccess = true))
+	UPROPERTY(EditDefaultsOnly, Category = "Turret", meta = (AllowPrivateAccess = true))
 	TObjectPtr<UNiagaraSystem> DestroyParticle;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Cannon", meta = (AllowPrivateAccess = true))
+	UPROPERTY(EditDefaultsOnly, Category = "Turret", meta = (AllowPrivateAccess = true))
 	TObjectPtr<USoundCue> DestroySound;
 
-	/** The current enemy that the cannon try to shoot at it */
+	/** The current enemy that the turret try to shoot at it */
 	UPROPERTY(Replicated)
 	TObjectPtr<AActor> CurrentTarget = nullptr;
 
-	/** Target rotation that the cannon will try to look at when there is no enemy */
+	/** Target rotation that the turret will try to look at when there is no enemy */
 	UPROPERTY(Replicated)
 	FRotator RandomRotation = FRotator::ZeroRotator;
 
-	/** If set to True, the cannon will try to find and look at a random rotation. */
+	/** If set to True, the turret will try to find and look at a random rotation. */
 	uint8 bCanRotateRandomly : 1;
 
-	/** Used to call FireCannon() in a loop */
+	/** Used to call FireTurret() in a loop */
 	FTimerHandle FireTimer;
 
 	/** FindNewTarget() start this timer to recheck for a new target */

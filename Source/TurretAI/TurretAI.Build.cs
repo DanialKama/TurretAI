@@ -2,9 +2,9 @@
 
 using UnrealBuildTool;
 
-public class CannonAI : ModuleRules
+public class TurretAI : ModuleRules
 {
-	public CannonAI(ReadOnlyTargetRules Target) : base(Target)
+	public TurretAI(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
 		

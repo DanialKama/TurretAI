@@ -1,6 +1,6 @@
 // Copyright 2023 Danial Kamali. All Rights Reserved.
 
-#include "Actors/Cannon.h"
+#include "Actors/Turret.h"
 
 #include "ACtors/Projectile.h"
 #include "Components/Health.h"
@@ -11,7 +11,7 @@
 #include "Sound/SoundCue.h"
 #include "TimerManager.h"
 
-ACannon::ACannon()
+ATurret::ATurret()
 {
 	PrimaryActorTick.bCanEverTick = true;
 	bReplicates = true;
@@ -48,16 +48,16 @@ ACannon::ACannon()
 	RandomRotation = FRotator::ZeroRotator;
 }
 
-void ACannon::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &OutLifetimeProps) const
+void ATurret::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	// Replicate to everyone
-	DOREPLIFETIME(ACannon, CurrentTarget);
-	DOREPLIFETIME(ACannon, RandomRotation);
+	DOREPLIFETIME(ATurret, CurrentTarget);
+	DOREPLIFETIME(ATurret, RandomRotation);
 }
 
-void ACannon::BeginPlay()
+void ATurret::BeginPlay()
 {
 	Super::BeginPlay();
 
@@ -66,27 +66,27 @@ void ACannon::BeginPlay()
 		HealthComp->Activate(false);
 		
 		Detector->SetGenerateOverlapEvents(true);
-		Detector->OnComponentBeginOverlap.AddDynamic(this, &ACannon::DetectorBeginOverlap);
-		Detector->OnComponentEndOverlap.AddDynamic(this, &ACannon::DetectorEndOverlap);
+		Detector->OnComponentBeginOverlap.AddDynamic(this, &ATurret::DetectorBeginOverlap);
+		Detector->OnComponentEndOverlap.AddDynamic(this, &ATurret::DetectorEndOverlap);
 	}
 }
 
-void ACannon::Tick(float DeltaTime)
+void ATurret::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	// Cannon will start rotation randomly if there is no target.
+	// Turret will start rotation randomly if there is no target.
 	if (CanRotateRandomly())
 	{
 		bCanRotateRandomly = false;
 
 		// Delay between switching to a new rotation
 		FTimerHandle TimerHandle;
-		GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ACannon::FindRandomRotation, 2.0f);
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ATurret::FindRandomRotation, 2.0f);
 	}
 }
 
-void ACannon::DetectorBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
+void ATurret::DetectorBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
 	int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (!CurrentTarget)
@@ -95,7 +95,7 @@ void ACannon::DetectorBeginOverlap(UPrimitiveComponent* OverlappedComponent, AAc
 	}
 }
 
-void ACannon::DetectorEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+void ATurret::DetectorEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
 	if (OtherActor == CurrentTarget)
 	{
@@ -103,7 +103,7 @@ void ACannon::DetectorEndOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 	}
 }
 
-void ACannon::FindNewTarget()
+void ATurret::FindNewTarget()
 {
 	// Clear the search timer because we are starting a new search
 	GetWorld()->GetTimerManager().ClearTimer(SearchTimer);
@@ -112,7 +112,7 @@ void ACannon::FindNewTarget()
 	
 	HandleFindNewTarget();
 
-	// Only reset the random rotation if the cannon is not switching between targets.
+	// Only reset the random rotation if the turret is not switching between targets.
 	if (!CurrentTarget)
 	{
 		// Start random rotation if failed to find another target.
@@ -120,7 +120,7 @@ void ACannon::FindNewTarget()
 	}
 }
 
-void ACannon::HandleFindNewTarget()
+void ATurret::HandleFindNewTarget()
 {
 	TArray<AActor*> Actors;
 	Detector->GetOverlappingActors(Actors);
@@ -138,25 +138,25 @@ void ACannon::HandleFindNewTarget()
 		}
 
 		// Retry
-		GetWorld()->GetTimerManager().SetTimer(SearchTimer, this, &ACannon::HandleFindNewTarget, 0.5f);
+		GetWorld()->GetTimerManager().SetTimer(SearchTimer, this, &ATurret::HandleFindNewTarget, 0.5f);
 	}
 }
 
-void ACannon::StartFire()
+void ATurret::StartFire()
 {
 	if (CanHitTarget(CurrentTarget, true))
 	{
-		MulticastFireCannon(CalculateProjectileDirection());
+		MulticastFireWeapon(CalculateProjectileDirection());
 	}
 		
-	GetWorld()->GetTimerManager().SetTimer(FireTimer, this, &ACannon::FireCannon, CannonInfo.FireRate, true);
+	GetWorld()->GetTimerManager().SetTimer(FireTimer, this, &ATurret::FireWeapon, TurretInfo.FireRate, true);
 }
 
-void ACannon::FireCannon()
+void ATurret::FireWeapon()
 {
 	if (CurrentTarget && CanHitTarget(CurrentTarget, true))
 	{
-		MulticastFireCannon(CalculateProjectileDirection());
+		MulticastFireWeapon(CalculateProjectileDirection());
 	}
 	else
 	{
@@ -165,21 +165,21 @@ void ACannon::FireCannon()
 	}
 }
 
-TArray<FRotator> ACannon::CalculateProjectileDirection() const
+TArray<FRotator> ATurret::CalculateProjectileDirection() const
 {
 	TArray<FRotator> OutRotations;
 	const FRotator SocketRotation = BarrelMesh->GetSocketRotation("ProjectileSocket");
 	
-	if (CannonInfo.CannonAbility & static_cast<uint32>(ECannonAbility::Shotgun))
+	if (TurretInfo.TurretAbility & static_cast<uint32>(ETurretAbility::Shotgun))
 	{
 		uint8 i = 1;
 		while (i <= 3)
 		{
 			FRotator NewRotation;
 			
-			NewRotation.Pitch	= SocketRotation.Pitch	+ FMath::RandRange(CannonInfo.AccuracyOffset * -1.0f, CannonInfo.AccuracyOffset);
-			NewRotation.Yaw		= SocketRotation.Yaw	+ FMath::RandRange(CannonInfo.AccuracyOffset * -1.0f, CannonInfo.AccuracyOffset);
-			NewRotation.Roll	= SocketRotation.Roll	+ FMath::RandRange(CannonInfo.AccuracyOffset * -1.0f, CannonInfo.AccuracyOffset);
+			NewRotation.Pitch	= SocketRotation.Pitch	+ FMath::RandRange(TurretInfo.AccuracyOffset * -1.0f, TurretInfo.AccuracyOffset);
+			NewRotation.Yaw		= SocketRotation.Yaw	+ FMath::RandRange(TurretInfo.AccuracyOffset * -1.0f, TurretInfo.AccuracyOffset);
+			NewRotation.Roll	= SocketRotation.Roll	+ FMath::RandRange(TurretInfo.AccuracyOffset * -1.0f, TurretInfo.AccuracyOffset);
 
 			OutRotations.Add(NewRotation);
 			++i;
@@ -193,7 +193,7 @@ TArray<FRotator> ACannon::CalculateProjectileDirection() const
 	return OutRotations;
 }
 
-bool ACannon::CanHitTarget(AActor* Target, bool bUseMuzzle) const
+bool ATurret::CanHitTarget(AActor* Target, bool bUseMuzzle) const
 {
 	FVector StartLocation, EndLocation;
 	
@@ -224,39 +224,39 @@ bool ACannon::CanHitTarget(AActor* Target, bool bUseMuzzle) const
 	return false;
 }
 
-void ACannon::FindRandomRotation()
+void ATurret::FindRandomRotation()
 {
 	if (!CurrentTarget)
 	{
 		if (FMath::IsNearlyEqual(RandomRotation.Pitch, BarrelMesh->GetRelativeRotation().Pitch, 1))
 		{
-			RandomRotation = FRotator(FMath::RandRange(CannonInfo.MinPitch, CannonInfo.MaxPitch), FMath::RandRange(-180.0f, 180.0f), 0.0f);
+			RandomRotation = FRotator(FMath::RandRange(TurretInfo.MinPitch, TurretInfo.MaxPitch), FMath::RandRange(-180.0f, 180.0f), 0.0f);
 			
 			bCanRotateRandomly = true;
 		}
 		else	// When the barrel hasn't reached the target rotation, retry after a delay
 		{
 			FTimerHandle TimerHandle;
-			GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ACannon::FindRandomRotation, 1.0f);
+			GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ATurret::FindRandomRotation, 1.0f);
 		}
 	}
 }
 
-FRotator ACannon::CalculateRotation(const UStaticMeshComponent* CompToRotate, float DeltaTime) const
+FRotator ATurret::CalculateRotation(const UStaticMeshComponent* CompToRotate, float DeltaTime) const
 {
 	if (CurrentTarget)
 	{
 		// Follow the target
 		const FVector NewLocation = CurrentTarget->GetActorLocation() - BarrelMesh->GetComponentLocation();
 		const FRotator TargetRotation = FRotationMatrix::MakeFromX(GetActorTransform().InverseTransformVectorNoScale(NewLocation)).Rotator();	// Inverse Transform Direction
-		return FMath::RInterpConstantTo(CompToRotate->GetRelativeRotation(), TargetRotation, DeltaTime, CannonInfo.RotationSpeed);
+		return FMath::RInterpConstantTo(CompToRotate->GetRelativeRotation(), TargetRotation, DeltaTime, TurretInfo.RotationSpeed);
 	}
 	
 	// Perform random rotation
-	return FMath::RInterpConstantTo(CompToRotate->GetRelativeRotation(), RandomRotation, DeltaTime, CannonInfo.RotationSpeed);
+	return FMath::RInterpConstantTo(CompToRotate->GetRelativeRotation(), RandomRotation, DeltaTime, TurretInfo.RotationSpeed);
 }
 
-bool ACannon::CanRotateRandomly() const
+bool ATurret::CanRotateRandomly() const
 {
 	if (GetLocalRole() == ROLE_Authority && bCanRotateRandomly && !CurrentTarget)
 	{
@@ -266,7 +266,7 @@ bool ACannon::CanRotateRandomly() const
 	return false;
 }
 
-void ACannon::MulticastFireCannon_Implementation(const TArray<FRotator>& Rotations)
+void ATurret::MulticastFireWeapon_Implementation(const TArray<FRotator>& Rotations)
 {
 	FTransform NewTransform;
 	NewTransform.SetLocation(BarrelMesh->GetSocketLocation("ProjectileSocket"));
@@ -294,10 +294,10 @@ void ACannon::MulticastFireCannon_Implementation(const TArray<FRotator>& Rotatio
 	UGameplayStatics::SpawnSoundAtLocation(GetWorld(), FireSound, NewTransform.GetLocation());
 }
 
-void ACannon::SpawnProjectile(FTransform Transform)
+void ATurret::SpawnProjectile(FTransform Transform)
 {
 	USceneComponent* NewTarget = nullptr;
-	if (CannonInfo.CannonAbility & static_cast<uint32>(ECannonAbility::Homing))
+	if (TurretInfo.TurretAbility & static_cast<uint32>(ETurretAbility::Homing))
 	{
 		NewTarget = CurrentTarget->GetRootComponent();
 	}
@@ -307,7 +307,7 @@ void ACannon::SpawnProjectile(FTransform Transform)
 	// Initialize the projectile
 	NewProjectile->HomingTarget = NewTarget;
 	
-	if (CannonInfo.CannonAbility & static_cast<uint32>(ECannonAbility::ExplosiveShot))
+	if (TurretInfo.TurretAbility & static_cast<uint32>(ETurretAbility::ExplosiveShot))
 	{
 		NewProjectile->ProjectileAbility |= Ability_Explosive;
 	}
@@ -318,26 +318,26 @@ void ACannon::SpawnProjectile(FTransform Transform)
 	UGameplayStatics::FinishSpawningActor(NewProjectile, Transform);
 }
 
-void ACannon::HealthChanged(float NewHealth)
+void ATurret::HealthChanged(float NewHealth)
 {
 	if (NewHealth <= 0.0f)
 	{
-		DestroyCannon();
+		DestroyTurret();
 	}
 }
 
-void ACannon::DestroyCannon()
+void ATurret::DestroyTurret()
 {
 	SetLifeSpan(6.0f);
 	
-	MulticastDestroyCannon();
+	MulticastDestroyTurret();
 
 	// TODO: Disable detector
 	GetWorld()->GetTimerManager().ClearTimer(FireTimer);
 	GetWorld()->GetTimerManager().ClearTimer(SearchTimer);
 }
 
-void ACannon::MulticastDestroyCannon_Implementation()
+void ATurret::MulticastDestroyTurret_Implementation()
 {
 	SetActorTickEnabled(false);
 
@@ -358,10 +358,10 @@ void ACannon::MulticastDestroyCannon_Implementation()
 	BarrelMesh->SetSimulatePhysics(true);
 
 	FTimerHandle TimerHandle;
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ACannon::StartSink, 4.0f);
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ATurret::StartSink, 4.0f);
 }
 
-void ACannon::StartSink() const
+void ATurret::StartSink() const
 {
 	BaseMesh->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Ignore);
 	BarrelMesh->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Ignore);

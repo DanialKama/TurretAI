@@ -16,7 +16,7 @@ constexpr uint8 Ability_Explosive	{1 << 1}; // 0000 0010
  * Base class for projectiles
  */
 UCLASS()
-class CANNONAI_API AProjectile : public AActor
+class TURRETAI_API AProjectile : public AActor
 {
 	GENERATED_BODY()
 	

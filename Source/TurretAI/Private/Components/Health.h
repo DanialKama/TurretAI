@@ -7,7 +7,7 @@
 #include "Health.generated.h"
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class CANNONAI_API UHealth : public UActorComponent
+class TURRETAI_API UHealth : public UActorComponent
 {
 	GENERATED_BODY()
 
@@ -23,7 +23,7 @@ private:
 
 // Variables
 public:
-	UPROPERTY(EditAnywhere, Category = "Cannon", meta = (ClampMin = "0.0", UIMin = "0.0"))
+	UPROPERTY(EditAnywhere, Category = "Default", meta = (ClampMin = "0.0", UIMin = "0.0"))
 	float DefaultHealth = 100.0f;
 
 private:

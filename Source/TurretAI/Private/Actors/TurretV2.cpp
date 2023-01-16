@@ -1,8 +1,8 @@
 // Copyright 2023 Danial Kamali. All Rights Reserved.
 
-#include "Actors/CannonV2.h"
+#include "Actors/TurretV2.h"
 
-ACannonV2::ACannonV2()
+ATurretV2::ATurretV2()
 {
 	TurretMesh = CreateDefaultSubobject<UStaticMeshComponent>("TurretMesh");
 	TurretMesh->SetupAttachment(BaseMesh, "ConnectionSocket");
@@ -14,7 +14,7 @@ ACannonV2::ACannonV2()
 	BarrelMesh->SetupAttachment(TurretMesh);
 }
 
-void ACannonV2::Tick(float DeltaTime)
+void ATurretV2::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
@@ -22,18 +22,18 @@ void ACannonV2::Tick(float DeltaTime)
 	TurretMesh->SetRelativeRotation(FRotator(0.0f, NewRotation.Yaw, 0.0f));
 
 	NewRotation = CalculateRotation(BarrelMesh, DeltaTime);
-	BarrelMesh->SetRelativeRotation(FRotator(FMath::ClampAngle(NewRotation.Pitch, CannonInfo.MinPitch, CannonInfo.MaxPitch), 0.0f, 0.0f));
+	BarrelMesh->SetRelativeRotation(FRotator(FMath::ClampAngle(NewRotation.Pitch, TurretInfo.MinPitch, TurretInfo.MaxPitch), 0.0f, 0.0f));
 }
 
-void ACannonV2::MulticastDestroyCannon_Implementation()
+void ATurretV2::MulticastDestroyTurret_Implementation()
 {
-	Super::MulticastDestroyCannon_Implementation();
+	Super::MulticastDestroyTurret_Implementation();
 	
 	TurretMesh->SetCollisionProfileName("Destructible");
 	TurretMesh->SetSimulatePhysics(true);
 }
 
-void ACannonV2::StartSink() const
+void ATurretV2::StartSink() const
 {
 	Super::StartSink();
 	
