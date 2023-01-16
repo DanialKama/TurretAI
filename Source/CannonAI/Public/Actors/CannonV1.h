@@ -9,7 +9,7 @@
 /**
  * This version of the cannon includes a base and a barrel
  */
-UCLASS(meta = (DisplayName = "Cannon AI V1"))
+UCLASS(Blueprintable, meta = (DisplayName = "Cannon AI V1"))
 class CANNONAI_API ACannonV1 : public ACannon
 {
 	GENERATED_BODY()

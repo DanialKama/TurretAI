@@ -56,13 +56,13 @@ public:
 
 private:
 	/** For non-explosive projectiles, only Base Damage is required */
-	UPROPERTY(EditDefaultsOnly, Category = "Default", meta = (AllowPrivateAccess = true))
+	UPROPERTY(EditDefaultsOnly, Category = "Projectile", meta = (AllowPrivateAccess = true))
 	FRadialDamageParams DamageInfo;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Default", meta = (AllowPrivateAccess = true))
+	UPROPERTY(EditDefaultsOnly, Category = "Projectile", meta = (AllowPrivateAccess = true))
 	TObjectPtr<class UNiagaraSystem> HitParticle;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Default", meta = (AllowPrivateAccess = true))
+	UPROPERTY(EditDefaultsOnly, Category = "Projectile", meta = (AllowPrivateAccess = true))
 	TObjectPtr<class USoundCue> HitSound;
 
 	uint8 bDoOnceHit : 1;

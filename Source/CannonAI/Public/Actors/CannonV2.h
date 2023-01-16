@@ -9,7 +9,7 @@
 /**
  * This version of the cannon includes a base, a turret, and barrel
  */
-UCLASS(meta = (DisplayName = "Cannon AI V2"))
+UCLASS(Blueprintable, meta = (DisplayName = "Cannon AI V2"))
 class CANNONAI_API ACannonV2 : public ACannon
 {
 	GENERATED_BODY()
@@ -20,7 +20,7 @@ class CANNONAI_API ACannonV2 : public ACannon
 // Functions
 public:
 	/** Sets default values for this actor's properties */
-	ACannonV2(/*const FObjectInitializer& ObjectInitializer*/);
+	ACannonV2();
 	
 protected:
 	/** Called every frame */

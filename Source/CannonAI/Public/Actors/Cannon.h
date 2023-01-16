@@ -106,23 +106,23 @@ private:
 // Variables
 protected:
 	/** Cannon info structure that stores the essential data to initialize the cannon */
-	UPROPERTY(EditDefaultsOnly, Category = "Default")
+	UPROPERTY(EditDefaultsOnly, Category = "Cannon")
 	FCannonInfo CannonInfo;
 
 private:
-	UPROPERTY(EditDefaultsOnly, Category = "Default", meta = (AllowPrivateAccess = true))
+	UPROPERTY(EditDefaultsOnly, Category = "Cannon", meta = (AllowPrivateAccess = true))
 	TSubclassOf<class AProjectile> Projectile;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Default", meta = (AllowPrivateAccess = true))
+	UPROPERTY(EditDefaultsOnly, Category = "Cannon", meta = (AllowPrivateAccess = true))
 	TObjectPtr<UNiagaraSystem> FireParticle;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Default", meta = (AllowPrivateAccess = true))
+	UPROPERTY(EditDefaultsOnly, Category = "Cannon", meta = (AllowPrivateAccess = true))
 	TObjectPtr<USoundCue> FireSound;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Default", meta = (AllowPrivateAccess = true))
+	UPROPERTY(EditDefaultsOnly, Category = "Cannon", meta = (AllowPrivateAccess = true))
 	TObjectPtr<UNiagaraSystem> DestroyParticle;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Default", meta = (AllowPrivateAccess = true))
+	UPROPERTY(EditDefaultsOnly, Category = "Cannon", meta = (AllowPrivateAccess = true))
 	TObjectPtr<USoundCue> DestroySound;
 
 	/** The current enemy that the cannon try to shoot at it */

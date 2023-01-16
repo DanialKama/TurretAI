@@ -2,8 +2,7 @@
 
 #include "Actors/CannonV2.h"
 
-ACannonV2::ACannonV2(/*const FObjectInitializer& ObjectInitializer*/)
-/*: Super(ObjectInitializer)*/
+ACannonV2::ACannonV2()
 {
 	TurretMesh = CreateDefaultSubobject<UStaticMeshComponent>("TurretMesh");
 	TurretMesh->SetupAttachment(BaseMesh, "ConnectionSocket");
