@@ -294,28 +294,26 @@ void ATurret::MulticastFireWeapon_Implementation(const TArray<FRotator>& Rotatio
 	UGameplayStatics::SpawnSoundAtLocation(GetWorld(), FireSound, NewTransform.GetLocation());
 }
 
-void ATurret::SpawnProjectile(FTransform Transform)
+void ATurret::SpawnProjectile(const FTransform& Transform)
 {
-	USceneComponent* NewTarget = nullptr;
-	if (TurretInfo.TurretAbility & static_cast<uint32>(ETurretAbility::Homing))
+	if (AProjectile* NewProjectile = GetWorld()->SpawnActorDeferred<AProjectile>(Projectile, Transform, this, GetInstigator()))
 	{
-		NewTarget = CurrentTarget->GetRootComponent();
+		// Initialize the projectile
+		if (TurretInfo.TurretAbility & static_cast<uint32>(ETurretAbility::Homing))
+		{
+			NewProjectile->HomingTarget = CurrentTarget->GetRootComponent();
+		}
+		
+		if (TurretInfo.TurretAbility & static_cast<uint32>(ETurretAbility::ExplosiveShot))
+		{
+			NewProjectile->ProjectileAbility |= Ability_Explosive;
+		}
+		
+		// Ignoring collisions between barrel and projectile
+		BarrelMesh->IgnoreActorWhenMoving(NewProjectile, true);
+		
+		UGameplayStatics::FinishSpawningActor(NewProjectile, Transform);
 	}
-
-	AProjectile* NewProjectile = GetWorld()->SpawnActorDeferred<AProjectile>(Projectile, Transform, this, GetInstigator());
-
-	// Initialize the projectile
-	NewProjectile->HomingTarget = NewTarget;
-	
-	if (TurretInfo.TurretAbility & static_cast<uint32>(ETurretAbility::ExplosiveShot))
-	{
-		NewProjectile->ProjectileAbility |= Ability_Explosive;
-	}
-
-	// Ignoring collisions between barrel and projectile
-	BarrelMesh->IgnoreActorWhenMoving(NewProjectile, true);
-	
-	UGameplayStatics::FinishSpawningActor(NewProjectile, Transform);
 }
 
 void ATurret::HealthChanged(float NewHealth)

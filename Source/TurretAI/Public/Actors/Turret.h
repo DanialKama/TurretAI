@@ -90,7 +90,7 @@ private:
 	void MulticastFireWeapon(const TArray<FRotator>& Rotations);
 	void MulticastFireWeapon_Implementation(const TArray<FRotator>& Rotations);
 
-	void SpawnProjectile(FTransform Transform);
+	void SpawnProjectile(const FTransform& Transform);
 
 	/** Finding a new random rotation for the turret to use when there is no enemy */
 	void FindRandomRotation();
