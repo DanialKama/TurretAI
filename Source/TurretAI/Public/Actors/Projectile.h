@@ -7,10 +7,10 @@
 #include "GameFramework/Actor.h"
 #include "Projectile.generated.h"
 
-// TODO: Try to implement bit flags in a better way
-// Projectile Abilities
-constexpr uint8 Ability_None		{1 << 0}; // 0000 0001
-constexpr uint8 Ability_Explosive	{1 << 1}; // 0000 0010
+enum EProjectileAbility
+{
+	Explosive = 0x01
+};
 
 /**
  * Base class for projectiles
@@ -42,8 +42,8 @@ private:
 	UFUNCTION()
 	void ProjectileHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
-	void ApplyNormalHit(FHitResult HitResult) const;
-	void ApplyExplosiveHit(FHitResult HitResult) const;
+	void ApplyNormalHit(const FHitResult& HitResult) const;
+	void ApplyExplosiveHit(const FHitResult& HitResult) const;
 
 	/** Disabling the projectile after hit and destroying it with a delay so trail particles have time to disappear */
 	void DisableProjectile();
@@ -52,7 +52,7 @@ private:
 public:
 	TObjectPtr<USceneComponent> HomingTarget;
 
-	uint8 ProjectileAbility = Ability_None;
+	uint8 ProjectileAbility = 0;
 
 private:
 	/** For non-explosive projectiles, only Base Damage is required */

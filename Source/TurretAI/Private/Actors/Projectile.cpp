@@ -59,7 +59,7 @@ void AProjectile::ProjectileHit(UPrimitiveComponent* HitComponent, AActor* Other
 		// Is server
 		if (GetWorld()->GetNetMode() != NM_Client)
 		{
-			if (ProjectileAbility & Ability_Explosive)
+			if (ProjectileAbility & Explosive)
 			{
 				ApplyExplosiveHit(Hit);
 			}
@@ -73,13 +73,13 @@ void AProjectile::ProjectileHit(UPrimitiveComponent* HitComponent, AActor* Other
 	}
 }
 
-void AProjectile::ApplyNormalHit(FHitResult HitResult) const
+void AProjectile::ApplyNormalHit(const FHitResult& HitResult) const
 {
 	UGameplayStatics::ApplyPointDamage(HitResult.GetActor(), DamageInfo.BaseDamage, HitResult.ImpactNormal, HitResult,
 		GetInstigatorController(), GetOwner(), nullptr);
 }
 
-void AProjectile::ApplyExplosiveHit(FHitResult HitResult) const
+void AProjectile::ApplyExplosiveHit(const FHitResult& HitResult) const
 {
 	const TArray<AActor*> Actors;
 	UGameplayStatics::ApplyRadialDamageWithFalloff(GetWorld(), DamageInfo.BaseDamage, DamageInfo.MinimumDamage, HitResult.ImpactPoint,

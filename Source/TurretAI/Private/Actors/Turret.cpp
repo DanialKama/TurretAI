@@ -306,7 +306,7 @@ void ATurret::SpawnProjectile(const FTransform& Transform)
 		
 		if (TurretInfo.HasFlag(ETurretAbility::ExplosiveShot))
 		{
-			NewProjectile->ProjectileAbility |= Ability_Explosive;
+			NewProjectile->ProjectileAbility |= Explosive;
 		}
 		
 		// Ignoring collisions between barrel and projectile
