@@ -170,7 +170,7 @@ TArray<FRotator> ATurret::CalculateProjectileDirection() const
 	TArray<FRotator> OutRotations;
 	const FRotator SocketRotation = BarrelMesh->GetSocketRotation("ProjectileSocket");
 	
-	if (TurretInfo.TurretAbility & static_cast<uint32>(ETurretAbility::Shotgun))
+	if (TurretInfo.HasFlag(ETurretAbility::Shotgun))
 	{
 		uint8 i = 1;
 		while (i <= 3)
@@ -299,12 +299,12 @@ void ATurret::SpawnProjectile(const FTransform& Transform)
 	if (AProjectile* NewProjectile = GetWorld()->SpawnActorDeferred<AProjectile>(Projectile, Transform, this, GetInstigator()))
 	{
 		// Initialize the projectile
-		if (TurretInfo.TurretAbility & static_cast<uint32>(ETurretAbility::Homing))
+		if (TurretInfo.HasFlag(ETurretAbility::Homing))
 		{
 			NewProjectile->HomingTarget = CurrentTarget->GetRootComponent();
 		}
 		
-		if (TurretInfo.TurretAbility & static_cast<uint32>(ETurretAbility::ExplosiveShot))
+		if (TurretInfo.HasFlag(ETurretAbility::ExplosiveShot))
 		{
 			NewProjectile->ProjectileAbility |= Ability_Explosive;
 		}

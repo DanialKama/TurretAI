@@ -2,25 +2,22 @@
 
 #pragma once
 
-// #include "Engine/DataTable.h"
 #include "TurretInfo.generated.h"
 
 UENUM(meta = (Bitflags, UseEnumValuesAsMaskValuesInEditor = "true"))
 enum class ETurretAbility
 {
-	None			= 0x00	UMETA(Hidden),
 	ExplosiveShot	= 0x01,
 	Homing			= 0x02,
 	Shotgun			= 0x04
 };
-
 ENUM_CLASS_FLAGS(ETurretAbility);
 
 /**
  * Used in turret class to initialize it
  */
 USTRUCT(BlueprintType)
-struct TURRETAI_API FTurretInfo /*: public FTableRowBase*/
+struct TURRETAI_API FTurretInfo
 {
 	GENERATED_BODY()
 
@@ -49,4 +46,14 @@ struct TURRETAI_API FTurretInfo /*: public FTableRowBase*/
 	FTurretInfo(const float InFireRate, const float InMaxPitch, const float InMinPitch, const float InRotationSpeed, const float InAccuracyOffset, const int32 InTurretAbility)
 		: FireRate(InFireRate), MaxPitch(InMaxPitch), MinPitch(InMinPitch), RotationSpeed(InRotationSpeed), AccuracyOffset(InAccuracyOffset), TurretAbility(InTurretAbility)
 	{}
+
+	void SetFlag(ETurretAbility Flag)
+	{
+		TurretAbility |= static_cast<int32>(Flag);
+	}
+	
+	bool HasFlag(ETurretAbility Flag) const
+	{
+		return (TurretAbility & static_cast<int32>(Flag)) /* == static_cast<int>(Flag)*/;
+	}
 };
