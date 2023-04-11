@@ -5,7 +5,7 @@ This plugin contains a simple but optimized turret AI that works with single-pla
 Check the [BP_Turret](https://github.com/DanialKama/TurretAI/blob/main/Content/Blueprints/BP_Turret.uasset) and [BP_Projectile](https://github.com/DanialKama/TurretAI/blob/main/Content/Blueprints/BP_Projectile.uasset) for more information on how to set up and use the turret AI.
 
 ## Additional Notes
-<!--- You can access the demo and pictures of the project [here](TODO).  -->
+You can access the demo and pictures of the project [here](https://danialkama.itch.io/turretai).  
 If you have any questions or suggestions, please feel free to [message me](https://github.com/DanialKama#-connect-with-me).
 
 ## Credits
