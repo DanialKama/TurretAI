@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "TurretInfo.generated.h"
+#include "TurretTypes.generated.h"
 
 UENUM(meta = (Bitflags, UseEnumValuesAsMaskValuesInEditor = "true"))
 enum class ETurretAbility
@@ -39,12 +39,9 @@ struct TURRETAI_API FTurretInfo
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Turret", meta = (Bitmask, BitmaskEnum = "/Script/TurretAI.ETurretAbility"))
 	int32 TurretAbility;
 
+	// Default constructor
 	FTurretInfo()
 		: FireRate(1.0f), MaxPitch(45.0f), MinPitch(-45.0f), RotationSpeed(100.0f), AccuracyOffset(10.0f), TurretAbility(0)
-	{}
-
-	FTurretInfo(const float InFireRate, const float InMaxPitch, const float InMinPitch, const float InRotationSpeed, const float InAccuracyOffset, const int32 InTurretAbility)
-		: FireRate(InFireRate), MaxPitch(InMaxPitch), MinPitch(InMinPitch), RotationSpeed(InRotationSpeed), AccuracyOffset(InAccuracyOffset), TurretAbility(InTurretAbility)
 	{}
 
 	void SetFlag(ETurretAbility Flag)
@@ -54,6 +51,6 @@ struct TURRETAI_API FTurretInfo
 	
 	bool HasFlag(ETurretAbility Flag) const
 	{
-		return (TurretAbility & static_cast<int32>(Flag)) /* == static_cast<int>(Flag)*/;
+		return (TurretAbility & static_cast<int32>(Flag)) == static_cast<int32>(Flag);
 	}
 };

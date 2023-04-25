@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Interfaces/GameplayInterface.h"
-#include "Structures/TurretInfo.h"
+#include "Types/TurretTypes.h"
 #include "Turret.generated.h"
 
 class UNiagaraSystem;
