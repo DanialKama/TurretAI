@@ -14,10 +14,16 @@ ADestroyedStructure::ADestroyedStructure()
 	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
 	RootComponent = StaticMesh;
 	StaticMesh->bApplyImpulseOnDamage = false;
-	StaticMesh->SetCollisionProfileName("Destructible");
 	StaticMesh->SetGenerateOverlapEvents(false);
 	StaticMesh->SetNotifyRigidBodyCollision(true);
 	StaticMesh->SetCanEverAffectNavigation(false);
+
+	// NOTE: You can create a new collision profile and use it
+	StaticMesh->SetCollisionProfileName(UCollisionProfile::BlockAllDynamic_ProfileName);
+	StaticMesh->SetCollisionResponseToAllChannels(ECR_Ignore);
+	StaticMesh->SetCollisionResponseToChannel(ECC_Camera, ECR_Block);
+	StaticMesh->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
+	StaticMesh->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Block);
 
 	// Initialize variables
 	bDoOnceHit = true;
