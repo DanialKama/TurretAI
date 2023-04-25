@@ -6,7 +6,6 @@
 #include "Kismet/GameplayStatics.h"
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
-#include "Sound/SoundCue.h"
 
 AProjectile::AProjectile()
 {
@@ -15,19 +14,19 @@ AProjectile::AProjectile()
 	SetCanBeDamaged(false);
 	InitialLifeSpan = 5.0f;
 
-	ProjectileMesh = CreateDefaultSubobject<UStaticMeshComponent>("ProjectileMesh");
+	ProjectileMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Projectile Mesh"));
 	RootComponent = ProjectileMesh;
 	ProjectileMesh->SetLinearDamping(0.0f);
 	ProjectileMesh->SetGenerateOverlapEvents(false);
 	ProjectileMesh->CanCharacterStepUpOn = ECB_No;
-	ProjectileMesh->SetCollisionProfileName("BlockAllDynamic");
-	ProjectileMesh->SetNotifyRigidBodyCollision(true);	// Simulation Generates Hit Events
+	ProjectileMesh->SetCollisionProfileName(UCollisionProfile::BlockAllDynamic_ProfileName);
+	ProjectileMesh->SetNotifyRigidBodyCollision(true);
 	ProjectileMesh->SetCanEverAffectNavigation(false);
 
-	TrailParticle = CreateDefaultSubobject<UNiagaraComponent>("TrailParticle");
+	TrailParticle = CreateDefaultSubobject<UNiagaraComponent>(TEXT("Trail Particle"));
 	TrailParticle->SetupAttachment(ProjectileMesh);
 
-	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>("ProjectileMovement");
+	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("Projectile Movement"));
 	
 	// Initialize variables
 	bDoOnceHit = true;
@@ -41,7 +40,7 @@ void AProjectile::BeginPlay()
 
 	ProjectileMesh->OnComponentHit.AddDynamic(this, &AProjectile::ProjectileHit);
 
-	if (HomingTarget)
+	if (HomingTarget.IsValid())
 	{
 		ProjectileMovement->HomingTargetComponent = HomingTarget;
 		ProjectileMovement->ProjectileGravityScale = 0.0f;

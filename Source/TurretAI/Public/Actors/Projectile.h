@@ -15,7 +15,7 @@ enum EProjectileAbility
 /**
  * Base class for projectiles
  */
-UCLASS()
+UCLASS(meta = (DisplayName = "Projectile"))
 class TURRETAI_API AProjectile : public AActor
 {
 	GENERATED_BODY()
@@ -50,7 +50,7 @@ private:
 
 // Variables
 public:
-	TObjectPtr<USceneComponent> HomingTarget;
+	TWeakObjectPtr<USceneComponent> HomingTarget;
 
 	uint8 ProjectileAbility = 0;
 
@@ -63,7 +63,7 @@ private:
 	TObjectPtr<class UNiagaraSystem> HitParticle;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Projectile", meta = (AllowPrivateAccess = true))
-	TObjectPtr<class USoundCue> HitSound;
+	TObjectPtr<USoundBase> HitSound;
 
 	uint8 bDoOnceHit : 1;
 };
