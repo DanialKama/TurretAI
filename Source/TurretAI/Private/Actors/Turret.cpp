@@ -3,7 +3,7 @@
 #include "Actors/Turret.h"
 
 #include "ACtors/Projectile.h"
-#include "Components/Health.h"
+#include "Components/HealthComponent.h"
 #include "Components/SphereComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
@@ -40,7 +40,7 @@ ATurret::ATurret()
 	Detector->SetCollisionProfileName("Trigger");
 	Detector->SetCanEverAffectNavigation(false);
 
-	HealthComp = CreateDefaultSubobject<UHealth>(TEXT("HealthComponent"));
+	HealthComp = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComponent"));
 
 	// Initialize variables
 	bCanRotateRandomly = true;

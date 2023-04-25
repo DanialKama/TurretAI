@@ -4,16 +4,16 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "Health.generated.h"
+#include "HealthComponent.generated.h"
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class TURRETAI_API UHealth : public UActorComponent
+class TURRETAI_API UHealthComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
 public:
 	/** Sets default values for this component's properties */
-	UHealth();
+	UHealthComponent();
 
 	virtual void Activate(bool bReset) override;
 
@@ -31,5 +31,5 @@ private:
 
 	float CurrentHealth = 0.0f;
 
-	TObjectPtr<class IGameplayInterface> GameplayInterface;
+	class IGameplayInterface* GameplayInterface;
 };

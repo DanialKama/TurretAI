@@ -1,10 +1,10 @@
 // Copyright 2023 Danial Kamali. All Rights Reserved.
 
-#include "Components/Health.h"
+#include "Components/HealthComponent.h"
 
 #include "Interfaces/GameplayInterface.h"
 
-UHealth::UHealth()
+UHealthComponent::UHealthComponent()
 {
 	PrimaryComponentTick.bCanEverTick = false;
 	PrimaryComponentTick.bStartWithTickEnabled = false;
@@ -14,16 +14,16 @@ UHealth::UHealth()
 	CurrentHealth = DefaultHealth;
 }
 
-void UHealth::Activate(bool bReset)
+void UHealthComponent::Activate(bool bReset)
 {
 	Super::Activate(bReset);
 
 	GameplayInterface = Cast<IGameplayInterface>(GetOwner());
 
-	GetOwner()->OnTakeAnyDamage.AddDynamic(this, &UHealth::OwnerTakeDamage);
+	GetOwner()->OnTakeAnyDamage.AddDynamic(this, &UHealthComponent::OwnerTakeDamage);
 }
 
-void UHealth::OwnerTakeDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser)
+void UHealthComponent::OwnerTakeDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser)
 {
 	if (bIsAlive)
 	{

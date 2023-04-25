@@ -30,7 +30,7 @@ private:
 	TObjectPtr<class USphereComponent> Detector;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = true))
-	TObjectPtr<class UHealth> HealthComp;
+	TObjectPtr<class UHealthComponent> HealthComp;
 
 // Functions
 public:
