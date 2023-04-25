@@ -8,7 +8,6 @@
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
 #include "NiagaraFunctionLibrary.h"
-#include "Sound/SoundCue.h"
 #include "TimerManager.h"
 
 ATurret::ATurret()
@@ -17,21 +16,21 @@ ATurret::ATurret()
 	bReplicates = true;
 	NetUpdateFrequency = 5.0f;
 	
-	BaseMesh = CreateDefaultSubobject<UStaticMeshComponent>("BaseMesh");
+	BaseMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BaseMesh"));
 	RootComponent = BaseMesh;
 	BaseMesh->Mobility = EComponentMobility::Static;
 	BaseMesh->bReplicatePhysicsToAutonomousProxy = false;
 	BaseMesh->SetGenerateOverlapEvents(false);
 	BaseMesh->CanCharacterStepUpOn = ECB_No;
 	
-	BarrelMesh = CreateDefaultSubobject<UStaticMeshComponent>("BarrelMesh");
+	BarrelMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BarrelMesh"));
 	BarrelMesh->SetupAttachment(BaseMesh, "ConnectionSocket");
 	BarrelMesh->bReplicatePhysicsToAutonomousProxy = false;
 	BarrelMesh->SetGenerateOverlapEvents(false);
 	BarrelMesh->CanCharacterStepUpOn = ECB_No;
 	BarrelMesh->SetCanEverAffectNavigation(false);
 
-	Detector = CreateDefaultSubobject<USphereComponent>("DetectorCollision");
+	Detector = CreateDefaultSubobject<USphereComponent>(TEXT("DetectorCollision"));
 	Detector->SetupAttachment(BaseMesh);
 	Detector->Mobility = EComponentMobility::Static;
 	Detector->SetAreaClassOverride(nullptr);
@@ -41,18 +40,16 @@ ATurret::ATurret()
 	Detector->SetCollisionProfileName("Trigger");
 	Detector->SetCanEverAffectNavigation(false);
 
-	HealthComp = CreateDefaultSubobject<UHealth>("HealthComponent");
+	HealthComp = CreateDefaultSubobject<UHealth>(TEXT("HealthComponent"));
 
 	// Initialize variables
 	bCanRotateRandomly = true;
-	RandomRotation = FRotator::ZeroRotator;
 }
 
 void ATurret::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	// Replicate to everyone
 	DOREPLIFETIME(ATurret, CurrentTarget);
 	DOREPLIFETIME(ATurret, RandomRotation);
 }
@@ -86,8 +83,7 @@ void ATurret::Tick(float DeltaTime)
 	}
 }
 
-void ATurret::DetectorBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
-	int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void ATurret::DetectorBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (!CurrentTarget)
 	{
@@ -208,18 +204,15 @@ bool ATurret::CanHitTarget(AActor* Target, bool bUseMuzzle) const
 		EndLocation = Target->GetActorLocation();
 	}
 	
-	FHitResult HitResult;
 	FCollisionQueryParams QueryParams;
-	QueryParams.AddIgnoredActor(this);	// Ignore self
+	QueryParams.AddIgnoredActor(this);
 
 	// NOTE: For better results, the sphere radius should match the projectile radius
-	if (GetWorld()->SweepSingleByChannel(HitResult, StartLocation, EndLocation, FQuat::Identity, ECC_Camera,
-		FCollisionShape::MakeSphere(50.0f), QueryParams))
+	FHitResult HitResult;
+	if (GetWorld()->SweepSingleByChannel(HitResult, StartLocation, EndLocation, FQuat::Identity, ECC_Camera, FCollisionShape::MakeSphere(50.0f), QueryParams) &&
+		HitResult.GetActor() == Target)
 	{
-		if (HitResult.GetActor() == Target)
-		{
-			return true;
-		}
+		return true;
 	}
 	return false;
 }

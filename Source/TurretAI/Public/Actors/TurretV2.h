@@ -22,10 +22,10 @@ public:
 	/** Sets default values for this actor's properties */
 	ATurretV2();
 	
-protected:
 	/** Called every frame */
 	virtual void Tick(float DeltaTime) override;
-
+	
+protected:
 	virtual void MulticastDestroyTurret_Implementation() override;
 
 	virtual void StartSink() const override;

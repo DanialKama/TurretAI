@@ -9,7 +9,6 @@
 #include "Turret.generated.h"
 
 class UNiagaraSystem;
-class USoundCue;
 
 /**
  * Turret AI base class
@@ -37,16 +36,16 @@ private:
 public:
 	/** Sets default values for this actor's properties */
 	ATurret();
-
-	// Gameplay Interface
-	virtual void HealthChanged(float NewHealth) override;
-	
-protected:
-	/** Called when the game starts or when spawned */
-	virtual void BeginPlay() override;
 	
 	/** Called every frame */
 	virtual void Tick(float DeltaTime) override;
+
+	// Gameplay Interface
+	virtual void HealthChanged(float NewHealth) override;
+
+protected:
+	/** Called when the game starts or when spawned */
+	virtual void BeginPlay() override;
 	
 	/** Calculating the target rotation so the turret will smoothly rotate toward the target */
 	FRotator CalculateRotation(const UStaticMeshComponent* CompToRotate, float DeltaTime) const;
@@ -57,8 +56,7 @@ protected:
 
 private:
 	UFUNCTION()
-	void DetectorBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
-		int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	void DetectorBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 	UFUNCTION()
 	void DetectorEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
@@ -79,7 +77,7 @@ private:
 	 * Checking the target state and see that can projectile hit the target
 	 * @param	Target		Target actor that we try to hit
 	 * @param	bUseMuzzle	Should use the muzzle location as the start location for the trace?
-	 * @return	TRUE if the projectile can hit the target
+	 * @return	True if the projectile can hit the target
 	 */
 	bool CanHitTarget(AActor* Target, bool bUseMuzzle) const;
 
@@ -117,17 +115,17 @@ private:
 	TObjectPtr<UNiagaraSystem> FireParticle;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Turret", meta = (AllowPrivateAccess = true))
-	TObjectPtr<USoundCue> FireSound;
+	TObjectPtr<USoundBase> FireSound;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Turret", meta = (AllowPrivateAccess = true))
 	TObjectPtr<UNiagaraSystem> DestroyParticle;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Turret", meta = (AllowPrivateAccess = true))
-	TObjectPtr<USoundCue> DestroySound;
+	TObjectPtr<USoundBase> DestroySound;
 
 	/** The current enemy that the turret try to shoot at it */
 	UPROPERTY(Replicated)
-	TObjectPtr<AActor> CurrentTarget = nullptr;
+	AActor* CurrentTarget;
 
 	/** Target rotation that the turret will try to look at when there is no enemy */
 	UPROPERTY(Replicated)

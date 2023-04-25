@@ -4,7 +4,7 @@
 
 ATurretV2::ATurretV2()
 {
-	TurretMesh = CreateDefaultSubobject<UStaticMeshComponent>("TurretMesh");
+	TurretMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("TurretMesh"));
 	TurretMesh->SetupAttachment(BaseMesh, "ConnectionSocket");
 	TurretMesh->bReplicatePhysicsToAutonomousProxy = false;
 	TurretMesh->SetGenerateOverlapEvents(false);
