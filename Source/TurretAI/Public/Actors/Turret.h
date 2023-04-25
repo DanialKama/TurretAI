@@ -40,6 +40,8 @@ public:
 	/** Called every frame */
 	virtual void Tick(float DeltaTime) override;
 
+	virtual void Destroyed() override;
+
 	// Gameplay Interface
 	virtual void HealthChanged(float NewHealth) override;
 
@@ -49,10 +51,6 @@ protected:
 	
 	/** Calculating the target rotation so the turret will smoothly rotate toward the target */
 	FRotator CalculateRotation(const UStaticMeshComponent* CompToRotate, float DeltaTime) const;
-	
-	virtual void MulticastDestroyTurret_Implementation();
-	
-	virtual void StartSink() const;
 
 private:
 	UFUNCTION()
@@ -95,11 +93,6 @@ private:
 
 	/** Can calculate random rotation? */
 	bool CanRotateRandomly() const;
-
-	void DestroyTurret();
-	
-	UFUNCTION(NetMulticast, Unreliable)
-	void MulticastDestroyTurret();
 	
 // Variables
 protected:

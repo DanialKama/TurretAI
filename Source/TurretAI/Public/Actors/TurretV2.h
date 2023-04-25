@@ -24,9 +24,6 @@ public:
 	
 	/** Called every frame */
 	virtual void Tick(float DeltaTime) override;
-	
-protected:
-	virtual void MulticastDestroyTurret_Implementation() override;
 
-	virtual void StartSink() const override;
+	virtual void Destroyed() override;
 };

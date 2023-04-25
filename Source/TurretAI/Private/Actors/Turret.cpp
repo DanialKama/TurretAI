@@ -5,6 +5,7 @@
 #include "Actors/Projectile.h"
 #include "Components/HealthComponent.h"
 #include "Components/SphereComponent.h"
+#include "DestroyedStructure.h"
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
 #include "NiagaraFunctionLibrary.h"
@@ -313,47 +314,30 @@ void ATurret::HealthChanged(float NewHealth)
 {
 	if (NewHealth <= 0.0f)
 	{
-		DestroyTurret();
+		Destroy();
 	}
 }
 
-void ATurret::DestroyTurret()
+void ATurret::Destroyed()
 {
-	SetLifeSpan(6.0f);
+	if (GetWorld()->HasBegunPlay())
+	{
+		FFXSystemSpawnParameters SpawnParams;
+		SpawnParams.WorldContextObject = GetWorld();
+		SpawnParams.SystemTemplate = DestroyParticle;
+		SpawnParams.Location = BaseMesh->GetSocketLocation("ConnectionSocket");
+		UNiagaraFunctionLibrary::SpawnSystemAtLocationWithParams(SpawnParams);
+			
+		UGameplayStatics::SpawnSoundAtLocation(GetWorld(), DestroySound, BaseMesh->GetComponentLocation());
+			
+		// Spawn the cannon base
+		const ADestroyedStructure* NewStructure = Cast<ADestroyedStructure>(GetWorld()->SpawnActor(ADestroyedStructure::StaticClass(), &BaseMesh->GetComponentTransform()));
+		NewStructure->Initialize(BaseMesh->GetStaticMesh(), BaseMesh->GetMaterials(), BaseMesh->GetLinearDamping(), BaseMesh->GetAngularDamping());
 	
-	MulticastDestroyTurret();
+		// Spawn the cannon barrel
+		NewStructure = Cast<ADestroyedStructure>(GetWorld()->SpawnActor(ADestroyedStructure::StaticClass(), &BarrelMesh->GetComponentTransform()));
+		NewStructure->Initialize(BarrelMesh->GetStaticMesh(), BarrelMesh->GetMaterials(), BarrelMesh->GetLinearDamping(), BarrelMesh->GetAngularDamping());
+	}
 
-	// TODO: Disable detector
-	GetWorld()->GetTimerManager().ClearTimer(FireTimer);
-	GetWorld()->GetTimerManager().ClearTimer(SearchTimer);
-}
-
-void ATurret::MulticastDestroyTurret_Implementation()
-{
-	SetActorTickEnabled(false);
-
-	FFXSystemSpawnParameters SpawnParams;
-	SpawnParams.WorldContextObject = GetWorld();
-	SpawnParams.SystemTemplate = DestroyParticle;
-	SpawnParams.Location = BaseMesh->GetSocketLocation("ConnectionSocket");
-	UNiagaraFunctionLibrary::SpawnSystemAtLocationWithParams(SpawnParams);
-	
-	UGameplayStatics::SpawnSoundAtLocation(GetWorld(), DestroySound, GetActorLocation());
-
-	BaseMesh->SetCanEverAffectNavigation(false);
-	BaseMesh->SetMobility(EComponentMobility::Movable);
-	BaseMesh->SetCollisionProfileName("Destructible");
-	BaseMesh->SetSimulatePhysics(true);
-
-	BarrelMesh->SetCollisionProfileName("Destructible");
-	BarrelMesh->SetSimulatePhysics(true);
-
-	FTimerHandle TimerHandle;
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ATurret::StartSink, 4.0f);
-}
-
-void ATurret::StartSink() const
-{
-	BaseMesh->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Ignore);
-	BarrelMesh->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Ignore);
+	Super::Destroyed();
 }
