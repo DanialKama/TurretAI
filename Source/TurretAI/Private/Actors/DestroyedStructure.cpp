@@ -54,5 +54,6 @@ void ADestroyedStructure::MeshHit(UPrimitiveComponent* HitComponent, AActor* Oth
 
 void ADestroyedStructure::StartSink() const
 {
+	StaticMesh->SetLinearDamping(1.0f);
 	StaticMesh->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Ignore);
 }
