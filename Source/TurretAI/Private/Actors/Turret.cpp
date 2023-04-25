@@ -2,7 +2,7 @@
 
 #include "Actors/Turret.h"
 
-#include "ACtors/Projectile.h"
+#include "Actors/Projectile.h"
 #include "Components/HealthComponent.h"
 #include "Components/SphereComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -16,21 +16,21 @@ ATurret::ATurret()
 	bReplicates = true;
 	NetUpdateFrequency = 5.0f;
 	
-	BaseMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BaseMesh"));
+	BaseMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Base Mesh"));
 	RootComponent = BaseMesh;
 	BaseMesh->Mobility = EComponentMobility::Static;
 	BaseMesh->bReplicatePhysicsToAutonomousProxy = false;
 	BaseMesh->SetGenerateOverlapEvents(false);
 	BaseMesh->CanCharacterStepUpOn = ECB_No;
 	
-	BarrelMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BarrelMesh"));
+	BarrelMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Barrel Mesh"));
 	BarrelMesh->SetupAttachment(BaseMesh, "ConnectionSocket");
 	BarrelMesh->bReplicatePhysicsToAutonomousProxy = false;
 	BarrelMesh->SetGenerateOverlapEvents(false);
 	BarrelMesh->CanCharacterStepUpOn = ECB_No;
 	BarrelMesh->SetCanEverAffectNavigation(false);
 
-	Detector = CreateDefaultSubobject<USphereComponent>(TEXT("DetectorCollision"));
+	Detector = CreateDefaultSubobject<USphereComponent>(TEXT("Detector Collision"));
 	Detector->SetupAttachment(BaseMesh);
 	Detector->Mobility = EComponentMobility::Static;
 	Detector->SetAreaClassOverride(nullptr);
@@ -40,7 +40,7 @@ ATurret::ATurret()
 	Detector->SetCollisionProfileName("Trigger");
 	Detector->SetCanEverAffectNavigation(false);
 
-	HealthComp = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComponent"));
+	HealthComp = CreateDefaultSubobject<UHealthComponent>(TEXT("Health Component"));
 
 	// Initialize variables
 	bCanRotateRandomly = true;
