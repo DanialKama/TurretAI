@@ -3,6 +3,7 @@
 #include "DestroyedStructure.h"
 
 #include "Components/StaticMeshComponent.h"
+#include "TimerManager.h"
 
 ADestroyedStructure::ADestroyedStructure()
 {
@@ -53,8 +54,17 @@ void ADestroyedStructure::MeshHit(UPrimitiveComponent* HitComponent, AActor* Oth
 		bDoOnceHit = false;
 		StaticMesh->SetNotifyRigidBodyCollision(false);
 
-		FTimerHandle TimerHandle;
-		GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ADestroyedStructure::StartSink, GetLifeSpan() - 2.0f);
+		const float Delay = GetLifeSpan() - 2.0f;
+		
+		if (Delay > 0.0f)
+		{
+			FTimerHandle TimerHandle;
+			GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ADestroyedStructure::StartSink, Delay);
+		}
+		else
+		{
+			StartSink();
+		}
 	}
 }
 
