@@ -3,6 +3,8 @@
 #include "DestroyedStructure.h"
 
 #include "Components/StaticMeshComponent.h"
+#include "Engine/CollisionProfile.h"
+#include "Engine/World.h"
 #include "TimerManager.h"
 
 ADestroyedStructure::ADestroyedStructure()

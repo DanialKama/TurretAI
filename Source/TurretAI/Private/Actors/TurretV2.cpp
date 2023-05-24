@@ -3,6 +3,7 @@
 #include "Actors/TurretV2.h"
 
 #include "DestroyedStructure.h"
+#include "Engine/World.h"
 
 ATurretV2::ATurretV2()
 {

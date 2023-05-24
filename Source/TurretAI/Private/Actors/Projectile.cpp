@@ -3,11 +3,14 @@
 #include "Actors/Projectile.h"
 
 #include "Engine/AssetManager.h"
+#include "Engine/CollisionProfile.h"
 #include "Engine/StreamableManager.h"
+#include "Engine/World.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
+#include "Sound/SoundBase.h"
 
 AProjectile::AProjectile()
 {
