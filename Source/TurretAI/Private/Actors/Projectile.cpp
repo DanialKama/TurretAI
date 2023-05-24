@@ -98,13 +98,13 @@ void AProjectile::ProjectileHit(UPrimitiveComponent* HitComponent, AActor* Other
 
 	DisableProjectile();
 	
-	// Is server
+	// Is server?
 	if (GetWorld()->GetNetMode() == NM_Client)
 	{
 		return;
 	}
 	
-	if (ProjectileAbility & Explosive)
+	if (HasFlag(EProjectileAbility::Explosive))
 	{
 		ApplyExplosiveHit(Hit);
 	}
@@ -131,7 +131,7 @@ void AProjectile::DisableProjectile()
 	FFXSystemSpawnParameters SpawnParams;
 	SpawnParams.WorldContextObject = GetWorld();
 	SpawnParams.SystemTemplate = HitParticleLoaded;
-	SpawnParams.Location = GetActorLocation();
+	SpawnParams.Location = ProjectileMesh->GetComponentLocation();
 	UNiagaraFunctionLibrary::SpawnSystemAtLocationWithParams(SpawnParams);
 	
 	UGameplayStatics::SpawnSoundAtLocation(SpawnParams.WorldContextObject, HitSoundLoaded, GetActorLocation());
