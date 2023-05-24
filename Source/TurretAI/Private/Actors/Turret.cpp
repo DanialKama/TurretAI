@@ -176,7 +176,7 @@ void ATurret::FindNewTarget()
 	
 	CurrentTarget = nullptr;
 	
-	HandleFindNewTarget();
+	FindNewTargetImpl();
 
 	// Only reset the random rotation if the turret is not switching between targets.
 	if (CurrentTarget == nullptr)
@@ -186,7 +186,7 @@ void ATurret::FindNewTarget()
 	}
 }
 
-void ATurret::HandleFindNewTarget()
+void ATurret::FindNewTargetImpl()
 {
 	TArray<AActor*> Actors;
 	Detector->GetOverlappingActors(Actors);
@@ -198,33 +198,33 @@ void ATurret::HandleFindNewTarget()
 	
 	for (AActor* NewTarget : Actors)
 	{
-		if (CanHitTarget(NewTarget, false))
+		if (CanSeeTarget(NewTarget))
 		{
 			CurrentTarget = NewTarget;
-			StartFire();
+			StartFireTurret();
 			return;
 		}
 	}
 
 	// Retry
-	GetWorld()->GetTimerManager().SetTimer(SearchTimer, this, &ATurret::HandleFindNewTarget, 0.5f);
+	GetWorld()->GetTimerManager().SetTimer(SearchTimer, this, &ATurret::FindNewTargetImpl, 0.5f);
 }
 
-void ATurret::StartFire()
+void ATurret::StartFireTurret()
 {
-	if (CanHitTarget(CurrentTarget, true))
+	if (CanHitTarget(CurrentTarget))
 	{
-		MulticastFireWeapon(CalculateProjectileDirection());
+		HandleFireTurret();
 	}
 	
-	GetWorld()->GetTimerManager().SetTimer(FireTimer, this, &ATurret::FireWeapon, TurretInfo.FireRate, true);
+	GetWorld()->GetTimerManager().SetTimer(FireTimer, this, &ATurret::FireTurret, TurretInfo.FireRate, true);
 }
 
-void ATurret::FireWeapon()
+void ATurret::FireTurret()
 {
-	if (CurrentTarget && CanHitTarget(CurrentTarget, true))
+	if (CurrentTarget && CanHitTarget(CurrentTarget))
 	{
-		MulticastFireWeapon(CalculateProjectileDirection());
+		HandleFireTurret();
 	}
 	else
 	{
@@ -233,55 +233,37 @@ void ATurret::FireWeapon()
 	}
 }
 
-TArray<FRotator> ATurret::CalculateProjectileDirection() const
+void ATurret::HandleFireTurret()
 {
-	TArray<FRotator> OutRotations;
-	const FRotator SocketRotation = BarrelMesh->GetSocketRotation("ProjectileSocket");
-	
-	if (TurretInfo.HasFlag(ETurretAbility::Shotgun))
-	{
-		uint8 i = 1;
-		while (i <= 3)
-		{
-			FRotator NewRotation;
-			
-			NewRotation.Pitch	= SocketRotation.Pitch	+ FMath::RandRange(TurretInfo.AccuracyOffset * -1.0f, TurretInfo.AccuracyOffset);
-			NewRotation.Yaw		= SocketRotation.Yaw	+ FMath::RandRange(TurretInfo.AccuracyOffset * -1.0f, TurretInfo.AccuracyOffset);
-			NewRotation.Roll	= SocketRotation.Roll	+ FMath::RandRange(TurretInfo.AccuracyOffset * -1.0f, TurretInfo.AccuracyOffset);
-
-			OutRotations.Add(NewRotation);
-			++i;
-		}
-	}
-	else
-	{
-		OutRotations.Add(SocketRotation);
-	}
-
-	return OutRotations;
+	MulticastFireTurret();
 }
 
-bool ATurret::CanHitTarget(AActor* Target, bool bUseMuzzle) const
+bool ATurret::CanSeeTarget(AActor* Target) const
 {
-	FVector StartLocation, EndLocation;
+	FCollisionQueryParams CollisionParams;
+	CollisionParams.AddIgnoredActor(this);
 	
-	if (bUseMuzzle)
+	FHitResult HitResult;
+	if (GetWorld()->LineTraceSingleByChannel(HitResult, BaseMesh->GetSocketLocation("ConnectionSocket"), Target->GetActorLocation(), ECC_Visibility, CollisionParams))
 	{
-		StartLocation = BarrelMesh->GetSocketLocation("ProjectileSocket");
-		EndLocation = StartLocation + BarrelMesh->GetForwardVector() * (Detector->GetUnscaledSphereRadius() + 100.0f);
+		return HitResult.GetActor() == Target;
 	}
-	else
-	{
-		StartLocation = BaseMesh->GetSocketLocation("ConnectionSocket");
-		EndLocation = Target->GetActorLocation();
-	}
+
+	return false;
+}
+
+bool ATurret::CanHitTarget(AActor* Target) const
+{
+	FVector StartLocation = BarrelMesh->GetSocketLocation("ProjectileSocket");
+	FVector EndLocation = StartLocation + BarrelMesh->GetForwardVector() * (Detector->GetUnscaledSphereRadius() + 100.0f);
 	
-	FCollisionQueryParams QueryParams;
-	QueryParams.AddIgnoredActor(this);
+	FCollisionQueryParams CollisionParams;
+	CollisionParams.AddIgnoredActor(this);
+	CollisionParams.MobilityType = EQueryMobilityType::Dynamic;
 
 	// NOTE: For better results, the sphere radius should match the projectile radius
 	FHitResult HitResult;
-	if (GetWorld()->SweepSingleByChannel(HitResult, StartLocation, EndLocation, FQuat::Identity, ECC_Camera, FCollisionShape::MakeSphere(50.0f), QueryParams) &&
+	if (GetWorld()->SweepSingleByChannel(HitResult, StartLocation, EndLocation, FQuat::Identity, ECC_Camera, FCollisionShape::MakeSphere(50.0f), CollisionParams) &&
 		HitResult.GetActor() == Target)
 	{
 		return true;
@@ -318,6 +300,7 @@ FRotator ATurret::CalculateRotation(const UStaticMeshComponent* CompToRotate, fl
 		// Follow the target
 		const FVector NewLocation = CurrentTarget->GetActorLocation() - BarrelMesh->GetComponentLocation();
 		const FRotator TargetRotation = FRotationMatrix::MakeFromX(GetActorTransform().InverseTransformVectorNoScale(NewLocation)).Rotator();	// Inverse Transform Direction
+
 		return FMath::RInterpConstantTo(CompToRotate->GetRelativeRotation(), TargetRotation, DeltaTime, TurretInfo.RotationSpeed);
 	}
 	
@@ -325,32 +308,15 @@ FRotator ATurret::CalculateRotation(const UStaticMeshComponent* CompToRotate, fl
 	return FMath::RInterpConstantTo(CompToRotate->GetRelativeRotation(), RandomRotation, DeltaTime, TurretInfo.RotationSpeed);
 }
 
-void ATurret::MulticastFireWeapon_Implementation(const TArray<FRotator>& Rotations)
+void ATurret::MulticastFireTurret_Implementation()
 {
-	FTransform NewTransform;
-	NewTransform.SetLocation(BarrelMesh->GetSocketLocation("ProjectileSocket"));
-
-	// If there is more than 1 projectile to spawn, lower the scale
-	NewTransform.SetScale3D(Rotations.Num() > 1 ? GetActorScale3D() - 1.0f + 0.4f : GetActorScale3D());
-	
-	for (FRotator NewRotation : Rotations)
+	if (CurrentTarget == nullptr)
 	{
-		NewTransform.SetRotation(NewRotation.Quaternion());
-		
-		SpawnProjectile(NewTransform);
+		return;
 	}
-
-	NewTransform = BarrelMesh->GetSocketTransform("MuzzleSocket");
 	
-	FFXSystemSpawnParameters SpawnParams;
-	SpawnParams.WorldContextObject = GetWorld();
-	SpawnParams.SystemTemplate = FireParticleLoaded;
-	SpawnParams.Location = NewTransform.GetLocation();
-	SpawnParams.Rotation = NewTransform.GetRotation().Rotator();
-	SpawnParams.Scale = GetActorScale3D() + 0.5f;
-	UNiagaraFunctionLibrary::SpawnSystemAtLocationWithParams(SpawnParams);
-	
-	UGameplayStatics::SpawnSoundAtLocation(SpawnParams.WorldContextObject, FireSoundLoaded, SpawnParams.Location);
+	SpawnProjectile(BarrelMesh->GetSocketTransform("ProjectileSocket"));
+	SpawnFireFX();
 }
 
 void ATurret::SpawnProjectile(const FTransform& Transform)
@@ -370,7 +336,7 @@ void ATurret::SpawnProjectile(const FTransform& Transform)
 		
 		if (TurretInfo.HasFlag(ETurretAbility::ExplosiveShot))
 		{
-			NewProjectile->ProjectileAbility |= Explosive;
+			NewProjectile->SetFlag(EProjectileAbility::Explosive);
 		}
 		
 		// Ignoring collisions between barrel and projectile
@@ -378,6 +344,21 @@ void ATurret::SpawnProjectile(const FTransform& Transform)
 		
 		UGameplayStatics::FinishSpawningActor(NewProjectile, Transform);
 	}
+}
+
+void ATurret::SpawnFireFX() const
+{
+	const FTransform NewTransform = BarrelMesh->GetSocketTransform("MuzzleSocket");
+	
+	FFXSystemSpawnParameters SpawnParams;
+	SpawnParams.WorldContextObject = GetWorld();;
+	SpawnParams.SystemTemplate = FireParticleLoaded;
+	SpawnParams.Location = NewTransform.GetLocation();
+	SpawnParams.Rotation = NewTransform.GetRotation().Rotator();
+	SpawnParams.Scale = GetActorScale3D() + 0.5f;
+	UNiagaraFunctionLibrary::SpawnSystemAtLocationWithParams(SpawnParams);
+	
+	UGameplayStatics::SpawnSoundAtLocation(SpawnParams.WorldContextObject, FireSoundLoaded, SpawnParams.Location);
 }
 
 void ATurret::HealthChanged(float NewHealth)
@@ -401,11 +382,11 @@ void ATurret::Destroyed()
 		
 		UGameplayStatics::SpawnSoundAtLocation(MyWorld, DestroySoundLoaded, BaseMesh->GetComponentLocation());
 		
-		// Spawn the cannon base
+		// Spawn the turret base
 		const ADestroyedStructure* NewStructure = Cast<ADestroyedStructure>(MyWorld->SpawnActor(ADestroyedStructure::StaticClass(), &BaseMesh->GetComponentTransform()));
 		NewStructure->Initialize(BaseMesh->GetStaticMesh(), BaseMesh->GetMaterials(), BaseMesh->GetLinearDamping(), BaseMesh->GetAngularDamping());
 	
-		// Spawn the cannon barrel
+		// Spawn the turret barrel
 		NewStructure = Cast<ADestroyedStructure>(MyWorld->SpawnActor(ADestroyedStructure::StaticClass(), &BarrelMesh->GetComponentTransform()));
 		NewStructure->Initialize(BarrelMesh->GetStaticMesh(), BarrelMesh->GetMaterials(), BarrelMesh->GetLinearDamping(), BarrelMesh->GetAngularDamping());
 	}

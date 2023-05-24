@@ -50,9 +50,15 @@ protected:
 	/** Called when the game starts or when spawned */
 	virtual void BeginPlay() override;
 	
+	virtual void HandleFireTurret();
+
+	void SpawnProjectile(const FTransform& Transform);
+
+	void SpawnFireFX() const;
+	
 	/** Calculating the target rotation so the turret will smoothly rotate toward the target */
 	FRotator CalculateRotation(const UStaticMeshComponent* CompToRotate, float DeltaTime) const;
-
+	
 private:
 	void LoadAssets();
 	
@@ -65,31 +71,28 @@ private:
 	/** On losing the current target, switch to another target if there is any. */
 	void FindNewTarget();
 
-	/** Should not be called directly, use FindNewTarget() */
-	void HandleFindNewTarget();
+	/** @note Should not be called directly, use FindNewTarget() */
+	void FindNewTargetImpl();
+
+	/** A simple test to make sure that the turret can see the target and target is not behind any cover */
+	bool CanSeeTarget(AActor* Target) const;
+
+	/**
+	* Checking the target state and see that can projectile hit the target
+	* @param	Target	Target actor that we try to hit
+	* @return	True if the projectile can hit the target
+	*/
+	virtual bool CanHitTarget(AActor* Target) const;
 
 	/** Trying to fire the turret based on the current state of the target (enemy). */
-	void StartFire();
+	void StartFireTurret();
 
-	/** Fire the weapon */
-	void FireWeapon();
-	
-	/**
-	 * Checking the target state and see that can projectile hit the target
-	 * @param	Target		Target actor that we try to hit
-	 * @param	bUseMuzzle	Should use the muzzle location as the start location for the trace?
-	 * @return	True if the projectile can hit the target
-	 */
-	bool CanHitTarget(AActor* Target, bool bUseMuzzle) const;
-
-	/** Calculating direction for projectiles based on the turret ability and Accuracy Offset */
-	TArray<FRotator> CalculateProjectileDirection() const;
+	/** Handling firing the turret */
+	void FireTurret();
 	
 	UFUNCTION(NetMulticast, Unreliable)
-	void MulticastFireWeapon(const TArray<FRotator>& Rotations);
-	void MulticastFireWeapon_Implementation(const TArray<FRotator>& Rotations);
-
-	void SpawnProjectile(const FTransform& Transform);
+	void MulticastFireTurret();
+	void MulticastFireTurret_Implementation();
 
 	/** Finding a new random rotation for the turret to use when there is no enemy */
 	void FindRandomRotation();
@@ -99,6 +102,10 @@ protected:
 	/** Turret info structure that stores the essential data to initialize the turret */
 	UPROPERTY(EditDefaultsOnly, Category = "Turret")
 	FTurretInfo TurretInfo;
+
+	/** The current enemy that the turret try to shoot at it */
+	UPROPERTY(Replicated)
+	AActor* CurrentTarget;
 
 private:
 	UPROPERTY(EditDefaultsOnly, Category = "Turret", meta = (AllowPrivateAccess = true))
@@ -115,10 +122,6 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Turret", meta = (AllowPrivateAccess = true))
 	TSoftObjectPtr<USoundBase> DestroySound;
-
-	/** The current enemy that the turret try to shoot at it */
-	UPROPERTY(Replicated)
-	AActor* CurrentTarget;
 
 	/** Target rotation that the turret will try to look at when there is no enemy */
 	UPROPERTY(Replicated)
