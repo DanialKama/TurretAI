@@ -7,7 +7,6 @@
 
 ADestroyedStructure::ADestroyedStructure()
 {
-	PrimaryActorTick.bCanEverTick = false;
 	PrimaryActorTick.bStartWithTickEnabled = false;
 	SetCanBeDamaged(false);
 	InitialLifeSpan = 6.0f;
@@ -49,22 +48,23 @@ void ADestroyedStructure::Initialize(UStaticMesh* InMesh, TArray<UMaterialInterf
 
 void ADestroyedStructure::MeshHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	if (bDoOnceHit)
+	if (bDoOnceHit == false)
 	{
-		bDoOnceHit = false;
-		StaticMesh->SetNotifyRigidBodyCollision(false);
+		return;
+	}
+	
+	bDoOnceHit = false;
+	StaticMesh->SetNotifyRigidBodyCollision(false);
 
-		const float Delay = GetLifeSpan() - 2.0f;
-		
-		if (Delay > 0.0f)
-		{
-			FTimerHandle TimerHandle;
-			GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ADestroyedStructure::StartSink, Delay);
-		}
-		else
-		{
-			StartSink();
-		}
+	const float Delay = GetLifeSpan() - 2.0f;
+	if (Delay > 0.0f)
+	{
+		FTimerHandle TimerHandle;
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ADestroyedStructure::StartSink, Delay);
+	}
+	else
+	{
+		StartSink();
 	}
 }
 

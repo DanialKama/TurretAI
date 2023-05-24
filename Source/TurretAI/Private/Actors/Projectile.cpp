@@ -9,7 +9,6 @@
 
 AProjectile::AProjectile()
 {
-	PrimaryActorTick.bCanEverTick = false;
 	PrimaryActorTick.bStartWithTickEnabled = false;
 	SetCanBeDamaged(false);
 	InitialLifeSpan = 5.0f;
@@ -50,25 +49,29 @@ void AProjectile::BeginPlay()
 
 void AProjectile::ProjectileHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	if (bDoOnceHit)
+	if (bDoOnceHit == false)
 	{
-		bDoOnceHit = false;
-		ProjectileMesh->SetNotifyRigidBodyCollision(false);
-		
-		// Is server
-		if (GetWorld()->GetNetMode() != NM_Client)
-		{
-			if (ProjectileAbility & Explosive)
-			{
-				ApplyExplosiveHit(Hit);
-			}
-			else
-			{
-				ApplyNormalHit(Hit);
-			}
-		}
-		
-		DisableProjectile();
+		return;
+	}
+	
+	bDoOnceHit = false;
+	ProjectileMesh->SetNotifyRigidBodyCollision(false);
+
+	DisableProjectile();
+	
+	// Is server
+	if (GetWorld()->GetNetMode() == NM_Client)
+	{
+		return;
+	}
+	
+	if (ProjectileAbility & Explosive)
+	{
+		ApplyExplosiveHit(Hit);
+	}
+	else
+	{
+		ApplyNormalHit(Hit);
 	}
 }
 
@@ -80,9 +83,8 @@ void AProjectile::ApplyNormalHit(const FHitResult& HitResult) const
 
 void AProjectile::ApplyExplosiveHit(const FHitResult& HitResult) const
 {
-	const TArray<AActor*> Actors;
 	UGameplayStatics::ApplyRadialDamageWithFalloff(GetWorld(), DamageInfo.BaseDamage, DamageInfo.MinimumDamage, HitResult.ImpactPoint,
-		DamageInfo.InnerRadius, DamageInfo.OuterRadius, 1.0f, nullptr, Actors, GetOwner(), GetInstigatorController());
+		DamageInfo.InnerRadius, DamageInfo.OuterRadius, 1.0f, nullptr, TArray<AActor*>(), GetOwner(), GetInstigatorController());
 }
 
 void AProjectile::DisableProjectile()
@@ -93,7 +95,7 @@ void AProjectile::DisableProjectile()
 	SpawnParams.Location = GetActorLocation();
 	UNiagaraFunctionLibrary::SpawnSystemAtLocationWithParams(SpawnParams);
 	
-	UGameplayStatics::SpawnSoundAtLocation(GetWorld(), HitSound, GetActorLocation());
+	UGameplayStatics::SpawnSoundAtLocation(SpawnParams.WorldContextObject, HitSound, GetActorLocation());
 
 	ProjectileMesh->SetSimulatePhysics(false);
 	ProjectileMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);

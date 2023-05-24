@@ -8,7 +8,6 @@ ATurretV2::ATurretV2()
 {
 	TurretMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Turret Mesh"));
 	TurretMesh->SetupAttachment(BaseMesh, "ConnectionSocket");
-	TurretMesh->bReplicatePhysicsToAutonomousProxy = false;
 	TurretMesh->SetGenerateOverlapEvents(false);
 	TurretMesh->CanCharacterStepUpOn = ECB_No;
 	TurretMesh->SetCanEverAffectNavigation(false);
@@ -29,10 +28,11 @@ void ATurretV2::Tick(float DeltaTime)
 
 void ATurretV2::Destroyed()
 {
-	if (GetWorld()->HasBegunPlay())
+	UWorld* MyWorld = GetWorld();
+	if (MyWorld->HasBegunPlay())
 	{
 		// Spawn the cannon turret
-		const ADestroyedStructure* NewStructure = Cast<ADestroyedStructure>(GetWorld()->SpawnActor(ADestroyedStructure::StaticClass(), &TurretMesh->GetComponentTransform()));
+		const ADestroyedStructure* NewStructure = Cast<ADestroyedStructure>(MyWorld->SpawnActor(ADestroyedStructure::StaticClass(), &TurretMesh->GetComponentTransform()));
 		NewStructure->Initialize(TurretMesh->GetStaticMesh(), TurretMesh->GetMaterials(), TurretMesh->GetLinearDamping(), TurretMesh->GetAngularDamping());
 	}
 

@@ -42,8 +42,9 @@ public:
 
 	virtual void Destroyed() override;
 
-	// Gameplay Interface
+	//~ Begin Gameplay Interface
 	virtual void HealthChanged(float NewHealth) override;
+	//~ End Gameplay Interface
 
 protected:
 	/** Called when the game starts or when spawned */
@@ -90,9 +91,6 @@ private:
 
 	/** Finding a new random rotation for the turret to use when there is no enemy */
 	void FindRandomRotation();
-
-	/** Can calculate random rotation? */
-	bool CanRotateRandomly() const;
 	
 // Variables
 protected:

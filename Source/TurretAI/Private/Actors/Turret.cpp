@@ -20,13 +20,11 @@ ATurret::ATurret()
 	BaseMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Base Mesh"));
 	RootComponent = BaseMesh;
 	BaseMesh->Mobility = EComponentMobility::Static;
-	BaseMesh->bReplicatePhysicsToAutonomousProxy = false;
 	BaseMesh->SetGenerateOverlapEvents(false);
 	BaseMesh->CanCharacterStepUpOn = ECB_No;
 	
 	BarrelMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Barrel Mesh"));
 	BarrelMesh->SetupAttachment(BaseMesh, "ConnectionSocket");
-	BarrelMesh->bReplicatePhysicsToAutonomousProxy = false;
 	BarrelMesh->SetGenerateOverlapEvents(false);
 	BarrelMesh->CanCharacterStepUpOn = ECB_No;
 	BarrelMesh->SetCanEverAffectNavigation(false);
@@ -35,7 +33,6 @@ ATurret::ATurret()
 	Detector->SetupAttachment(BaseMesh);
 	Detector->Mobility = EComponentMobility::Static;
 	Detector->SetAreaClassOverride(nullptr);
-	Detector->PrimaryComponentTick.bStartWithTickEnabled = false;
 	Detector->SetGenerateOverlapEvents(false);	// Enable on the server only
 	Detector->CanCharacterStepUpOn = ECB_No;
 	Detector->SetCollisionProfileName("Trigger");
@@ -59,7 +56,8 @@ void ATurret::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (GetLocalRole() == ROLE_Authority)
+
+	if (HasAuthority())
 	{
 		HealthComp->Activate(false);
 		
@@ -74,7 +72,7 @@ void ATurret::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	// Turret will start rotation randomly if there is no target.
-	if (CanRotateRandomly())
+	if (HasAuthority() && bCanRotateRandomly && !CurrentTarget)
 	{
 		bCanRotateRandomly = false;
 
@@ -122,21 +120,23 @@ void ATurret::HandleFindNewTarget()
 	TArray<AActor*> Actors;
 	Detector->GetOverlappingActors(Actors);
 
-	if (Actors.Num() > 0)
+	if (Actors.IsEmpty())
 	{
-		for (AActor* NewTarget : Actors)
-		{
-			if (CanHitTarget(NewTarget, false))
-			{
-				CurrentTarget = NewTarget;
-				StartFire();
-				return;
-			}
-		}
-
-		// Retry
-		GetWorld()->GetTimerManager().SetTimer(SearchTimer, this, &ATurret::HandleFindNewTarget, 0.5f);
+		return;
 	}
+	
+	for (AActor* NewTarget : Actors)
+	{
+		if (CanHitTarget(NewTarget, false))
+		{
+			CurrentTarget = NewTarget;
+			StartFire();
+			return;
+		}
+	}
+
+	// Retry
+	GetWorld()->GetTimerManager().SetTimer(SearchTimer, this, &ATurret::HandleFindNewTarget, 0.5f);
 }
 
 void ATurret::StartFire()
@@ -145,7 +145,7 @@ void ATurret::StartFire()
 	{
 		MulticastFireWeapon(CalculateProjectileDirection());
 	}
-		
+	
 	GetWorld()->GetTimerManager().SetTimer(FireTimer, this, &ATurret::FireWeapon, TurretInfo.FireRate, true);
 }
 
@@ -215,24 +215,28 @@ bool ATurret::CanHitTarget(AActor* Target, bool bUseMuzzle) const
 	{
 		return true;
 	}
+	
 	return false;
 }
 
 void ATurret::FindRandomRotation()
 {
-	if (!CurrentTarget)
+	if (CurrentTarget)
 	{
-		if (FMath::IsNearlyEqual(RandomRotation.Pitch, BarrelMesh->GetRelativeRotation().Pitch, 1))
-		{
-			RandomRotation = FRotator(FMath::RandRange(TurretInfo.MinPitch, TurretInfo.MaxPitch), FMath::RandRange(-180.0f, 180.0f), 0.0f);
+		return;
+	}
+	
+	if (FMath::IsNearlyEqual(RandomRotation.Pitch, BarrelMesh->GetRelativeRotation().Pitch, 1))
+	{
+		RandomRotation = FRotator(FMath::RandRange(TurretInfo.MinPitch, TurretInfo.MaxPitch), FMath::RandRange(-180.0f, 180.0f), 0.0f);
 			
-			bCanRotateRandomly = true;
-		}
-		else	// When the barrel hasn't reached the target rotation, retry after a delay
-		{
-			FTimerHandle TimerHandle;
-			GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ATurret::FindRandomRotation, 1.0f);
-		}
+		bCanRotateRandomly = true;
+	}
+	else
+	{
+		// When the barrel hasn't reached the target rotation, retry after a delay
+		FTimerHandle TimerHandle;
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ATurret::FindRandomRotation, 1.0f);
 	}
 }
 
@@ -248,16 +252,6 @@ FRotator ATurret::CalculateRotation(const UStaticMeshComponent* CompToRotate, fl
 	
 	// Perform random rotation
 	return FMath::RInterpConstantTo(CompToRotate->GetRelativeRotation(), RandomRotation, DeltaTime, TurretInfo.RotationSpeed);
-}
-
-bool ATurret::CanRotateRandomly() const
-{
-	if (GetLocalRole() == ROLE_Authority && bCanRotateRandomly && !CurrentTarget)
-	{
-		return true;
-	}
-
-	return false;
 }
 
 void ATurret::MulticastFireWeapon_Implementation(const TArray<FRotator>& Rotations)
@@ -285,7 +279,7 @@ void ATurret::MulticastFireWeapon_Implementation(const TArray<FRotator>& Rotatio
 	SpawnParams.Scale = GetActorScale3D() + 0.5f;
 	UNiagaraFunctionLibrary::SpawnSystemAtLocationWithParams(SpawnParams);
 	
-	UGameplayStatics::SpawnSoundAtLocation(GetWorld(), FireSound, NewTransform.GetLocation());
+	UGameplayStatics::SpawnSoundAtLocation(SpawnParams.WorldContextObject, FireSound, SpawnParams.Location);
 }
 
 void ATurret::SpawnProjectile(const FTransform& Transform)
@@ -320,22 +314,23 @@ void ATurret::HealthChanged(float NewHealth)
 
 void ATurret::Destroyed()
 {
-	if (GetWorld()->HasBegunPlay())
+	UWorld* MyWorld = GetWorld();
+	if (MyWorld->HasBegunPlay())
 	{
 		FFXSystemSpawnParameters SpawnParams;
-		SpawnParams.WorldContextObject = GetWorld();
+		SpawnParams.WorldContextObject = MyWorld;
 		SpawnParams.SystemTemplate = DestroyParticle;
 		SpawnParams.Location = BaseMesh->GetSocketLocation("ConnectionSocket");
 		UNiagaraFunctionLibrary::SpawnSystemAtLocationWithParams(SpawnParams);
-			
-		UGameplayStatics::SpawnSoundAtLocation(GetWorld(), DestroySound, BaseMesh->GetComponentLocation());
-			
+		
+		UGameplayStatics::SpawnSoundAtLocation(MyWorld, DestroySound, BaseMesh->GetComponentLocation());
+		
 		// Spawn the cannon base
-		const ADestroyedStructure* NewStructure = Cast<ADestroyedStructure>(GetWorld()->SpawnActor(ADestroyedStructure::StaticClass(), &BaseMesh->GetComponentTransform()));
+		const ADestroyedStructure* NewStructure = Cast<ADestroyedStructure>(MyWorld->SpawnActor(ADestroyedStructure::StaticClass(), &BaseMesh->GetComponentTransform()));
 		NewStructure->Initialize(BaseMesh->GetStaticMesh(), BaseMesh->GetMaterials(), BaseMesh->GetLinearDamping(), BaseMesh->GetAngularDamping());
 	
 		// Spawn the cannon barrel
-		NewStructure = Cast<ADestroyedStructure>(GetWorld()->SpawnActor(ADestroyedStructure::StaticClass(), &BarrelMesh->GetComponentTransform()));
+		NewStructure = Cast<ADestroyedStructure>(MyWorld->SpawnActor(ADestroyedStructure::StaticClass(), &BarrelMesh->GetComponentTransform()));
 		NewStructure->Initialize(BarrelMesh->GetStaticMesh(), BarrelMesh->GetMaterials(), BarrelMesh->GetLinearDamping(), BarrelMesh->GetAngularDamping());
 	}
 
