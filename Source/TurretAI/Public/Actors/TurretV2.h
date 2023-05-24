@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Actors/Turret.h"
+#include "Turret.h"
 #include "TurretV2.generated.h"
 
 /**

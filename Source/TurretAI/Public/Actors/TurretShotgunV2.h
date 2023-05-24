@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Actors/Turret.h"
+#include "TurretShotgun.h"
 #include "TurretShotgunV2.generated.h"
 
 /**
  * This version of the turret includes a base, a turret, and barrel
  */
 UCLASS(Blueprintable, meta = (DisplayName = "Shotgun Turret AI V2"))
-class TURRETAI_API ATurretShotgunV2 : public ATurret
+class TURRETAI_API ATurretShotgunV2 : public ATurretShotgun
 {
 	GENERATED_BODY()
 	
