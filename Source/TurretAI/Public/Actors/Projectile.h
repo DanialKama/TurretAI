@@ -11,7 +11,8 @@ class UNiagaraSystem;
 
 enum EProjectileAbility
 {
-	Explosive = 0x01
+	None		= 0x00,
+	Explosive	= 0x01
 };
 
 /**
