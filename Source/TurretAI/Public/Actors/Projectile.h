@@ -7,6 +7,8 @@
 #include "GameFramework/Actor.h"
 #include "Projectile.generated.h"
 
+class UNiagaraSystem;
+
 enum EProjectileAbility
 {
 	Explosive = 0x01
@@ -39,6 +41,8 @@ protected:
 	virtual void BeginPlay() override;
 
 private:
+	void LoadAssets();
+	
 	UFUNCTION()
 	void ProjectileHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
@@ -60,10 +64,16 @@ private:
 	FRadialDamageParams DamageInfo;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Projectile", meta = (AllowPrivateAccess = true))
-	TObjectPtr<class UNiagaraSystem> HitParticle;
+	TSoftObjectPtr<UNiagaraSystem> HitParticle;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Projectile", meta = (AllowPrivateAccess = true))
-	TObjectPtr<USoundBase> HitSound;
+	TSoftObjectPtr<USoundBase> HitSound;
+	
+	UPROPERTY()
+	UNiagaraSystem* HitParticleLoaded;
 
+	UPROPERTY()
+	USoundBase* HitSoundLoaded;
+	
 	uint8 bDoOnceHit : 1;
 };

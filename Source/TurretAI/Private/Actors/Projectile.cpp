@@ -2,6 +2,8 @@
 
 #include "Actors/Projectile.h"
 
+#include "Engine/AssetManager.h"
+#include "Engine/StreamableManager.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "NiagaraComponent.h"
@@ -35,6 +37,8 @@ void AProjectile::BeginPlay()
 {
 	Super::BeginPlay();
 
+	LoadAssets();
+
 	ProjectileMesh->IgnoreActorWhenMoving(GetOwner(), true);
 
 	ProjectileMesh->OnComponentHit.AddDynamic(this, &AProjectile::ProjectileHit);
@@ -45,6 +49,41 @@ void AProjectile::BeginPlay()
 		ProjectileMovement->ProjectileGravityScale = 0.0f;
 		ProjectileMovement->bIsHomingProjectile = true;
 	}
+}
+
+void AProjectile::LoadAssets()
+{
+	TArray<FSoftObjectPath> Paths;
+
+	HitParticleLoaded = HitParticle.Get();
+	if (!HitParticleLoaded)
+	{
+		Paths.Add(HitParticle.ToSoftObjectPath());
+	}
+
+	HitSoundLoaded = HitSound.Get();
+	if (!HitSoundLoaded)
+	{
+		Paths.Add(HitSound.ToSoftObjectPath());
+	}
+
+	if (Paths.IsEmpty())
+	{
+		return;
+	}
+	
+	UAssetManager::GetStreamableManager().RequestAsyncLoad(Paths, FStreamableDelegate::CreateWeakLambda(this, [this]
+	{
+		if (!HitParticleLoaded)
+		{
+			HitParticleLoaded = Cast<UNiagaraSystem>(HitParticle.Get());
+		}
+	
+		if (!HitSoundLoaded)
+		{
+			HitSoundLoaded = Cast<USoundBase>(HitSound.Get());
+		}
+	}));
 }
 
 void AProjectile::ProjectileHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
@@ -91,11 +130,11 @@ void AProjectile::DisableProjectile()
 {
 	FFXSystemSpawnParameters SpawnParams;
 	SpawnParams.WorldContextObject = GetWorld();
-	SpawnParams.SystemTemplate = HitParticle;
+	SpawnParams.SystemTemplate = HitParticleLoaded;
 	SpawnParams.Location = GetActorLocation();
 	UNiagaraFunctionLibrary::SpawnSystemAtLocationWithParams(SpawnParams);
 	
-	UGameplayStatics::SpawnSoundAtLocation(SpawnParams.WorldContextObject, HitSound, GetActorLocation());
+	UGameplayStatics::SpawnSoundAtLocation(SpawnParams.WorldContextObject, HitSoundLoaded, GetActorLocation());
 
 	ProjectileMesh->SetSimulatePhysics(false);
 	ProjectileMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
