@@ -7,9 +7,9 @@
 UENUM(meta = (Bitflags, UseEnumValuesAsMaskValuesInEditor = "true"))
 enum class ETurretAbility
 {
+	None			= 0x00	UMETA(Hidden),
 	ExplosiveShot	= 0x01,
 	Homing			= 0x02,
-	Shotgun			= 0x04
 };
 ENUM_CLASS_FLAGS(ETurretAbility);
 
