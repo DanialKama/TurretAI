@@ -6,6 +6,8 @@
 #include "Components/HealthComponent.h"
 #include "Components/SphereComponent.h"
 #include "DestroyedStructure.h"
+#include "Engine/AssetManager.h"
+#include "Engine/StreamableManager.h"
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
 #include "NiagaraFunctionLibrary.h"
@@ -56,6 +58,7 @@ void ATurret::BeginPlay()
 {
 	Super::BeginPlay();
 
+	LoadAssets();
 
 	if (HasAuthority())
 	{
@@ -80,6 +83,74 @@ void ATurret::Tick(float DeltaTime)
 		FTimerHandle TimerHandle;
 		GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ATurret::FindRandomRotation, 2.0f);
 	}
+}
+
+void ATurret::LoadAssets()
+{
+	TArray<FSoftObjectPath> Paths;
+
+	ProjectileLoaded = Projectile.Get();
+	if (!ProjectileLoaded)
+	{
+		Paths.Add(Projectile.ToSoftObjectPath());
+	}
+	
+	FireParticleLoaded = FireParticle.Get();
+	if (!FireParticleLoaded)
+	{
+		Paths.Add(FireParticle.ToSoftObjectPath());
+	}
+
+	FireSoundLoaded = FireSound.Get();
+	if (!FireSoundLoaded)
+	{
+		Paths.Add(FireSound.ToSoftObjectPath());
+	}
+
+	DestroyParticleLoaded = DestroyParticle.Get();
+	if (!DestroyParticleLoaded)
+	{
+		Paths.Add(DestroyParticle.ToSoftObjectPath());
+	}
+
+	DestroySoundLoaded = DestroySound.Get();
+	if (!DestroySoundLoaded)
+	{
+		Paths.Add(DestroySound.ToSoftObjectPath());
+	}
+
+	if (Paths.IsEmpty())
+	{
+		return;
+	}
+	
+	UAssetManager::GetStreamableManager().RequestAsyncLoad(Paths, FStreamableDelegate::CreateWeakLambda(this, [this]
+	{
+		if (!ProjectileLoaded)
+		{
+			ProjectileLoaded = Projectile.Get();
+		}
+	
+		if (!FireParticleLoaded)
+		{
+			FireParticleLoaded = Cast<UNiagaraSystem>(FireParticle.Get());
+		}
+	
+		if (!FireSoundLoaded)
+		{
+			FireSoundLoaded = Cast<USoundBase>(FireSound.Get());
+		}
+	
+		if (!DestroyParticleLoaded)
+		{
+			DestroyParticleLoaded = Cast<UNiagaraSystem>(DestroyParticle.Get());
+		}
+	
+		if (!DestroySoundLoaded)
+		{
+			DestroySoundLoaded = Cast<USoundBase>(DestroySound.Get());
+		}
+	}));
 }
 
 void ATurret::DetectorBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -273,18 +344,23 @@ void ATurret::MulticastFireWeapon_Implementation(const TArray<FRotator>& Rotatio
 	
 	FFXSystemSpawnParameters SpawnParams;
 	SpawnParams.WorldContextObject = GetWorld();
-	SpawnParams.SystemTemplate = FireParticle;
+	SpawnParams.SystemTemplate = FireParticleLoaded;
 	SpawnParams.Location = NewTransform.GetLocation();
 	SpawnParams.Rotation = NewTransform.GetRotation().Rotator();
 	SpawnParams.Scale = GetActorScale3D() + 0.5f;
 	UNiagaraFunctionLibrary::SpawnSystemAtLocationWithParams(SpawnParams);
 	
-	UGameplayStatics::SpawnSoundAtLocation(SpawnParams.WorldContextObject, FireSound, SpawnParams.Location);
+	UGameplayStatics::SpawnSoundAtLocation(SpawnParams.WorldContextObject, FireSoundLoaded, SpawnParams.Location);
 }
 
 void ATurret::SpawnProjectile(const FTransform& Transform)
 {
-	if (AProjectile* NewProjectile = GetWorld()->SpawnActorDeferred<AProjectile>(Projectile, Transform, this, GetInstigator()))
+	if (ProjectileLoaded == nullptr)
+	{
+		ProjectileLoaded = Projectile.LoadSynchronous();
+	}
+	
+	if (AProjectile* NewProjectile = GetWorld()->SpawnActorDeferred<AProjectile>(ProjectileLoaded, Transform, this, GetInstigator()))
 	{
 		// Initialize the projectile
 		if (TurretInfo.HasFlag(ETurretAbility::Homing))
@@ -319,11 +395,11 @@ void ATurret::Destroyed()
 	{
 		FFXSystemSpawnParameters SpawnParams;
 		SpawnParams.WorldContextObject = MyWorld;
-		SpawnParams.SystemTemplate = DestroyParticle;
+		SpawnParams.SystemTemplate = DestroyParticleLoaded;
 		SpawnParams.Location = BaseMesh->GetSocketLocation("ConnectionSocket");
 		UNiagaraFunctionLibrary::SpawnSystemAtLocationWithParams(SpawnParams);
 		
-		UGameplayStatics::SpawnSoundAtLocation(MyWorld, DestroySound, BaseMesh->GetComponentLocation());
+		UGameplayStatics::SpawnSoundAtLocation(MyWorld, DestroySoundLoaded, BaseMesh->GetComponentLocation());
 		
 		// Spawn the cannon base
 		const ADestroyedStructure* NewStructure = Cast<ADestroyedStructure>(MyWorld->SpawnActor(ADestroyedStructure::StaticClass(), &BaseMesh->GetComponentTransform()));

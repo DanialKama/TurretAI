@@ -54,6 +54,8 @@ protected:
 	FRotator CalculateRotation(const UStaticMeshComponent* CompToRotate, float DeltaTime) const;
 
 private:
+	void LoadAssets();
+	
 	UFUNCTION()
 	void DetectorBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
@@ -100,19 +102,19 @@ protected:
 
 private:
 	UPROPERTY(EditDefaultsOnly, Category = "Turret", meta = (AllowPrivateAccess = true))
-	TSubclassOf<class AProjectile> Projectile;
+	TSoftClassPtr<class AProjectile> Projectile;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Turret", meta = (AllowPrivateAccess = true))
-	TObjectPtr<UNiagaraSystem> FireParticle;
+	TSoftObjectPtr<UNiagaraSystem> FireParticle;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Turret", meta = (AllowPrivateAccess = true))
-	TObjectPtr<USoundBase> FireSound;
+	TSoftObjectPtr<USoundBase> FireSound;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Turret", meta = (AllowPrivateAccess = true))
-	TObjectPtr<UNiagaraSystem> DestroyParticle;
+	TSoftObjectPtr<UNiagaraSystem> DestroyParticle;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Turret", meta = (AllowPrivateAccess = true))
-	TObjectPtr<USoundBase> DestroySound;
+	TSoftObjectPtr<USoundBase> DestroySound;
 
 	/** The current enemy that the turret try to shoot at it */
 	UPROPERTY(Replicated)
@@ -121,6 +123,21 @@ private:
 	/** Target rotation that the turret will try to look at when there is no enemy */
 	UPROPERTY(Replicated)
 	FRotator RandomRotation = FRotator::ZeroRotator;
+
+	UPROPERTY()
+	UClass* ProjectileLoaded;
+	
+	UPROPERTY()
+	UNiagaraSystem* FireParticleLoaded;
+	
+	UPROPERTY()
+	USoundBase* FireSoundLoaded;
+	
+	UPROPERTY()
+	UNiagaraSystem* DestroyParticleLoaded;
+
+	UPROPERTY()
+	USoundBase* DestroySoundLoaded;
 
 	/** If set to True, the turret will try to find and look at a random rotation. */
 	uint8 bCanRotateRandomly : 1;
