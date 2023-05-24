@@ -25,7 +25,9 @@ private:
 
 // Variables
 private:
-	/** Used to store selling info after initializing the cannon */
-	UPROPERTY(EditDefaultsOnly, Category = "Default", meta = (AllowPrivateAccess = true))
-	float AccuracyOffset = 5.0f;
+	UPROPERTY(EditDefaultsOnly, Category = "Turret", meta = (ClampMin = 1, UIMin = 1, AllowPrivateAccess = true))
+	uint8 NumOfShots = 3;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Turret", meta = (ClampMin = 0.0, UIMin = 0.0, AllowPrivateAccess = true))
+	float ShotgunSpread = 5.0f;
 };

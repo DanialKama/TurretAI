@@ -13,13 +13,13 @@ void ATurretShotgun::HandleFireTurret()
 	const FRotator SocketRotation = BarrelMesh->GetSocketRotation("ProjectileSocket");
 
 	uint8 i = 0;
-	while (i < 3)
+	while (i < NumOfShots)
 	{
 		FRotator NewRotation;
 			
-		NewRotation.Pitch	= SocketRotation.Pitch	+ FMath::RandRange(AccuracyOffset * -1.0f, AccuracyOffset);
-		NewRotation.Yaw		= SocketRotation.Yaw	+ FMath::RandRange(AccuracyOffset * -1.0f, AccuracyOffset);
-		NewRotation.Roll	= SocketRotation.Roll	+ FMath::RandRange(AccuracyOffset * -1.0f, AccuracyOffset);
+		NewRotation.Pitch	= SocketRotation.Pitch	+ FMath::RandRange(ShotgunSpread * -1.0f, ShotgunSpread);
+		NewRotation.Yaw		= SocketRotation.Yaw	+ FMath::RandRange(ShotgunSpread * -1.0f, ShotgunSpread);
+		NewRotation.Roll	= SocketRotation.Roll	+ FMath::RandRange(ShotgunSpread * -1.0f, ShotgunSpread);
 
 		Rotations.Add(NewRotation);
 		++i;
