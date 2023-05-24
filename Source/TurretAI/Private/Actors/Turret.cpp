@@ -75,7 +75,7 @@ void ATurret::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	// Turret will start rotation randomly if there is no target.
-	if (HasAuthority() && bCanRotateRandomly && !CurrentTarget)
+	if (HasAuthority() && bCanRotateRandomly && CurrentTarget == nullptr)
 	{
 		bCanRotateRandomly = false;
 
@@ -90,31 +90,31 @@ void ATurret::LoadAssets()
 	TArray<FSoftObjectPath> Paths;
 
 	ProjectileLoaded = Projectile.Get();
-	if (!ProjectileLoaded)
+	if (ProjectileLoaded == nullptr)
 	{
 		Paths.Add(Projectile.ToSoftObjectPath());
 	}
 	
 	FireParticleLoaded = FireParticle.Get();
-	if (!FireParticleLoaded)
+	if (FireParticleLoaded == nullptr)
 	{
 		Paths.Add(FireParticle.ToSoftObjectPath());
 	}
 
 	FireSoundLoaded = FireSound.Get();
-	if (!FireSoundLoaded)
+	if (FireSoundLoaded == nullptr)
 	{
 		Paths.Add(FireSound.ToSoftObjectPath());
 	}
 
 	DestroyParticleLoaded = DestroyParticle.Get();
-	if (!DestroyParticleLoaded)
+	if (DestroyParticleLoaded == nullptr)
 	{
 		Paths.Add(DestroyParticle.ToSoftObjectPath());
 	}
 
 	DestroySoundLoaded = DestroySound.Get();
-	if (!DestroySoundLoaded)
+	if (DestroySoundLoaded == nullptr)
 	{
 		Paths.Add(DestroySound.ToSoftObjectPath());
 	}
@@ -126,27 +126,27 @@ void ATurret::LoadAssets()
 	
 	UAssetManager::GetStreamableManager().RequestAsyncLoad(Paths, FStreamableDelegate::CreateWeakLambda(this, [this]
 	{
-		if (!ProjectileLoaded)
+		if (ProjectileLoaded == nullptr)
 		{
 			ProjectileLoaded = Projectile.Get();
 		}
 	
-		if (!FireParticleLoaded)
+		if (FireParticleLoaded == nullptr)
 		{
 			FireParticleLoaded = Cast<UNiagaraSystem>(FireParticle.Get());
 		}
 	
-		if (!FireSoundLoaded)
+		if (FireSoundLoaded == nullptr)
 		{
 			FireSoundLoaded = Cast<USoundBase>(FireSound.Get());
 		}
 	
-		if (!DestroyParticleLoaded)
+		if (DestroyParticleLoaded == nullptr)
 		{
 			DestroyParticleLoaded = Cast<UNiagaraSystem>(DestroyParticle.Get());
 		}
 	
-		if (!DestroySoundLoaded)
+		if (DestroySoundLoaded == nullptr)
 		{
 			DestroySoundLoaded = Cast<USoundBase>(DestroySound.Get());
 		}
@@ -155,7 +155,7 @@ void ATurret::LoadAssets()
 
 void ATurret::DetectorBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (!CurrentTarget)
+	if (CurrentTarget == nullptr)
 	{
 		FindNewTarget();
 	}
@@ -179,7 +179,7 @@ void ATurret::FindNewTarget()
 	HandleFindNewTarget();
 
 	// Only reset the random rotation if the turret is not switching between targets.
-	if (!CurrentTarget)
+	if (CurrentTarget == nullptr)
 	{
 		// Start random rotation if failed to find another target.
 		bCanRotateRandomly = true;

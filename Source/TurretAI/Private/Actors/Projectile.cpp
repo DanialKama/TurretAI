@@ -56,13 +56,13 @@ void AProjectile::LoadAssets()
 	TArray<FSoftObjectPath> Paths;
 
 	HitParticleLoaded = HitParticle.Get();
-	if (!HitParticleLoaded)
+	if (HitParticleLoaded == nullptr)
 	{
 		Paths.Add(HitParticle.ToSoftObjectPath());
 	}
 
 	HitSoundLoaded = HitSound.Get();
-	if (!HitSoundLoaded)
+	if (HitSoundLoaded == nullptr)
 	{
 		Paths.Add(HitSound.ToSoftObjectPath());
 	}
@@ -74,12 +74,12 @@ void AProjectile::LoadAssets()
 	
 	UAssetManager::GetStreamableManager().RequestAsyncLoad(Paths, FStreamableDelegate::CreateWeakLambda(this, [this]
 	{
-		if (!HitParticleLoaded)
+		if (HitParticleLoaded == nullptr)
 		{
 			HitParticleLoaded = Cast<UNiagaraSystem>(HitParticle.Get());
 		}
 	
-		if (!HitSoundLoaded)
+		if (HitSoundLoaded == nullptr)
 		{
 			HitSoundLoaded = Cast<USoundBase>(HitSound.Get());
 		}
