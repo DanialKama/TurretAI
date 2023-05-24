@@ -21,19 +21,19 @@ struct TURRETAI_API FTurretInfo
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Turret", meta = (ClampMin = "0.0", UIMin = "0.0"))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Turret", meta = (ClampMin = 0.0, UIMin = 0.0))
 	float FireRate;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Turret", meta = (ClampMin = "0.0", UIMin = "0.0"))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Turret", meta = (ClampMin = 0.0, UIMin = 0.0))
 	float MaxPitch;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Turret", meta = (ClampMax = "0.0", UIMax = "0.0"))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Turret", meta = (ClampMax = 0.0, UIMax = 0.0))
 	float MinPitch;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Turret", meta = (ClampMin = "0.0", UIMin = "0.0"))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Turret", meta = (ClampMin = 0.0, UIMin = 0.0))
 	float RotationSpeed;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Turret", meta = (ClampMin = "0.0", UIMin = "0.0"))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Turret", meta = (ClampMin = 0.0, UIMin = 0.0))
 	float AccuracyOffset;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Turret", meta = (Bitmask, BitmaskEnum = "/Script/TurretAI.ETurretAbility"))
