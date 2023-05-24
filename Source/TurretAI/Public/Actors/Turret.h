@@ -74,16 +74,6 @@ private:
 	/** @note Should not be called directly, use FindNewTarget() */
 	void FindNewTargetImpl();
 
-	/** A simple test to make sure that the turret can see the target and target is not behind any cover */
-	bool CanSeeTarget(AActor* Target) const;
-
-	/**
-	* Checking the target state and see that can projectile hit the target
-	* @param	Target	Target actor that we try to hit
-	* @return	True if the projectile can hit the target
-	*/
-	virtual bool CanHitTarget(AActor* Target) const;
-
 	/** Trying to fire the turret based on the current state of the target (enemy). */
 	void StartFireTurret();
 
@@ -96,6 +86,16 @@ private:
 
 	/** Finding a new random rotation for the turret to use when there is no enemy */
 	void FindRandomRotation();
+	
+	/** A simple test to make sure that the turret can see the target and target is not behind any cover */
+	bool CanSeeTarget(AActor* Target) const;
+
+	/**
+	* Checking the target state and see that can projectile hit the target
+	* @param	Target	Target actor that we try to hit
+	* @return	True if the projectile can hit the target
+	*/
+	virtual bool CanHitTarget(AActor* Target) const;
 	
 // Variables
 protected:

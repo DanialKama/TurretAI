@@ -238,76 +238,6 @@ void ATurret::HandleFireTurret()
 	MulticastFireTurret();
 }
 
-bool ATurret::CanSeeTarget(AActor* Target) const
-{
-	FCollisionQueryParams CollisionParams;
-	CollisionParams.AddIgnoredActor(this);
-	
-	FHitResult HitResult;
-	if (GetWorld()->LineTraceSingleByChannel(HitResult, BaseMesh->GetSocketLocation("ConnectionSocket"), Target->GetActorLocation(), ECC_Visibility, CollisionParams))
-	{
-		return HitResult.GetActor() == Target;
-	}
-
-	return false;
-}
-
-bool ATurret::CanHitTarget(AActor* Target) const
-{
-	FVector StartLocation = BarrelMesh->GetSocketLocation("ProjectileSocket");
-	FVector EndLocation = StartLocation + BarrelMesh->GetForwardVector() * (Detector->GetUnscaledSphereRadius() + 100.0f);
-	
-	FCollisionQueryParams CollisionParams;
-	CollisionParams.AddIgnoredActor(this);
-	CollisionParams.MobilityType = EQueryMobilityType::Dynamic;
-
-	// NOTE: For better results, the sphere radius should match the projectile radius
-	FHitResult HitResult;
-	if (GetWorld()->SweepSingleByChannel(HitResult, StartLocation, EndLocation, FQuat::Identity, ECC_Camera, FCollisionShape::MakeSphere(50.0f), CollisionParams) &&
-		HitResult.GetActor() == Target)
-	{
-		return true;
-	}
-	
-	return false;
-}
-
-void ATurret::FindRandomRotation()
-{
-	if (CurrentTarget)
-	{
-		return;
-	}
-	
-	if (FMath::IsNearlyEqual(RandomRotation.Pitch, BarrelMesh->GetRelativeRotation().Pitch, 1))
-	{
-		RandomRotation = FRotator(FMath::RandRange(TurretInfo.MinPitch, TurretInfo.MaxPitch), FMath::RandRange(-180.0f, 180.0f), 0.0f);
-			
-		bCanRotateRandomly = true;
-	}
-	else
-	{
-		// When the barrel hasn't reached the target rotation, retry after a delay
-		FTimerHandle TimerHandle;
-		GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ATurret::FindRandomRotation, 1.0f);
-	}
-}
-
-FRotator ATurret::CalculateRotation(const UStaticMeshComponent* CompToRotate, float DeltaTime) const
-{
-	if (CurrentTarget)
-	{
-		// Follow the target
-		const FVector NewLocation = CurrentTarget->GetActorLocation() - BarrelMesh->GetComponentLocation();
-		const FRotator TargetRotation = FRotationMatrix::MakeFromX(GetActorTransform().InverseTransformVectorNoScale(NewLocation)).Rotator();	// Inverse Transform Direction
-
-		return FMath::RInterpConstantTo(CompToRotate->GetRelativeRotation(), TargetRotation, DeltaTime, TurretInfo.RotationSpeed);
-	}
-	
-	// Perform random rotation
-	return FMath::RInterpConstantTo(CompToRotate->GetRelativeRotation(), RandomRotation, DeltaTime, TurretInfo.RotationSpeed);
-}
-
 void ATurret::MulticastFireTurret_Implementation()
 {
 	if (CurrentTarget == nullptr)
@@ -359,6 +289,76 @@ void ATurret::SpawnFireFX() const
 	UNiagaraFunctionLibrary::SpawnSystemAtLocationWithParams(SpawnParams);
 	
 	UGameplayStatics::SpawnSoundAtLocation(SpawnParams.WorldContextObject, FireSoundLoaded, SpawnParams.Location);
+}
+
+void ATurret::FindRandomRotation()
+{
+	if (CurrentTarget)
+	{
+		return;
+	}
+	
+	if (FMath::IsNearlyEqual(RandomRotation.Pitch, BarrelMesh->GetRelativeRotation().Pitch, 1))
+	{
+		RandomRotation = FRotator(FMath::RandRange(TurretInfo.MinPitch, TurretInfo.MaxPitch), FMath::RandRange(-180.0f, 180.0f), 0.0f);
+			
+		bCanRotateRandomly = true;
+	}
+	else
+	{
+		// When the barrel hasn't reached the target rotation, retry after a delay
+		FTimerHandle TimerHandle;
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ATurret::FindRandomRotation, 1.0f);
+	}
+}
+
+FRotator ATurret::CalculateRotation(const UStaticMeshComponent* CompToRotate, float DeltaTime) const
+{
+	if (CurrentTarget)
+	{
+		// Follow the target
+		const FVector NewLocation = CurrentTarget->GetActorLocation() - BarrelMesh->GetComponentLocation();
+		const FRotator TargetRotation = FRotationMatrix::MakeFromX(GetActorTransform().InverseTransformVectorNoScale(NewLocation)).Rotator();	// Inverse Transform Direction
+
+		return FMath::RInterpConstantTo(CompToRotate->GetRelativeRotation(), TargetRotation, DeltaTime, TurretInfo.RotationSpeed);
+	}
+	
+	// Perform random rotation
+	return FMath::RInterpConstantTo(CompToRotate->GetRelativeRotation(), RandomRotation, DeltaTime, TurretInfo.RotationSpeed);
+}
+
+bool ATurret::CanSeeTarget(AActor* Target) const
+{
+	FCollisionQueryParams CollisionParams;
+	CollisionParams.AddIgnoredActor(this);
+	
+	FHitResult HitResult;
+	if (GetWorld()->LineTraceSingleByProfile(HitResult, BaseMesh->GetSocketLocation("ConnectionSocket"), Target->GetActorLocation(), UCollisionProfile::Pawn_ProfileName, CollisionParams))
+	{
+		return HitResult.GetActor() == Target;
+	}
+	
+	return false;
+}
+
+bool ATurret::CanHitTarget(AActor* Target) const
+{
+	FVector StartLocation = BarrelMesh->GetSocketLocation("ProjectileSocket");
+	FVector EndLocation = StartLocation + BarrelMesh->GetForwardVector() * (Detector->GetUnscaledSphereRadius() + 100.0f);
+	
+	FCollisionQueryParams CollisionParams;
+	CollisionParams.AddIgnoredActor(this);
+	CollisionParams.MobilityType = EQueryMobilityType::Dynamic;
+
+	// NOTE: For better results, the sphere radius should match the projectile radius
+	FHitResult HitResult;
+	if (GetWorld()->SweepSingleByProfile(HitResult, StartLocation, EndLocation, FQuat::Identity, UCollisionProfile::Pawn_ProfileName, FCollisionShape::MakeSphere(50.0f), CollisionParams) &&
+		HitResult.GetActor() == Target)
+	{
+		return true;
+	}
+	
+	return false;
 }
 
 void ATurret::HealthChanged(float NewHealth)
