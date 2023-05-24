@@ -33,15 +33,12 @@ struct TURRETAI_API FTurretInfo
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Turret", meta = (ClampMin = 0.0, UIMin = 0.0))
 	float RotationSpeed;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Turret", meta = (ClampMin = 0.0, UIMin = 0.0))
-	float AccuracyOffset;
-	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Turret", meta = (Bitmask, BitmaskEnum = "/Script/TurretAI.ETurretAbility"))
 	int32 TurretAbility;
 
 	// Default constructor
 	FTurretInfo()
-		: FireRate(1.0f), MaxPitch(45.0f), MinPitch(-45.0f), RotationSpeed(100.0f), AccuracyOffset(10.0f), TurretAbility(0)
+		: FireRate(1.0f), MaxPitch(45.0f), MinPitch(-45.0f), RotationSpeed(100.0f), TurretAbility(0)
 	{}
 
 	void SetFlag(ETurretAbility Flag)
