@@ -89,34 +89,49 @@ void ATurret::LoadAssets()
 {
 	TArray<FSoftObjectPath> Paths;
 
-	ProjectileLoaded = Projectile.Get();
-	if (ProjectileLoaded == nullptr)
+	if (Projectile)
 	{
-		Paths.Add(Projectile.ToSoftObjectPath());
-	}
-	
-	FireParticleLoaded = FireParticle.Get();
-	if (FireParticleLoaded == nullptr)
-	{
-		Paths.Add(FireParticle.ToSoftObjectPath());
+		ProjectileLoaded = Projectile.Get();
+		if (ProjectileLoaded == nullptr)
+		{
+			Paths.Add(Projectile.ToSoftObjectPath());
+		}
 	}
 
-	FireSoundLoaded = FireSound.Get();
-	if (FireSoundLoaded == nullptr)
+	if (FireParticle)
 	{
-		Paths.Add(FireSound.ToSoftObjectPath());
+		FireParticleLoaded = FireParticle.Get();
+		if (FireParticleLoaded == nullptr)
+		{
+			Paths.Add(FireParticle.ToSoftObjectPath());
+		}
 	}
 
-	DestroyParticleLoaded = DestroyParticle.Get();
-	if (DestroyParticleLoaded == nullptr)
+	if (FireSound)
 	{
-		Paths.Add(DestroyParticle.ToSoftObjectPath());
+		FireSoundLoaded = FireSound.Get();
+		if (FireSoundLoaded == nullptr)
+		{
+			Paths.Add(FireSound.ToSoftObjectPath());
+		}
 	}
 
-	DestroySoundLoaded = DestroySound.Get();
-	if (DestroySoundLoaded == nullptr)
+	if (DestroyParticle)
 	{
-		Paths.Add(DestroySound.ToSoftObjectPath());
+		DestroyParticleLoaded = DestroyParticle.Get();
+		if (DestroyParticleLoaded == nullptr)
+		{
+			Paths.Add(DestroyParticle.ToSoftObjectPath());
+		}
+	}
+
+	if (DestroySound)
+	{
+		DestroySoundLoaded = DestroySound.Get();
+		if (DestroySoundLoaded == nullptr)
+		{
+			Paths.Add(DestroySound.ToSoftObjectPath());
+		}
 	}
 
 	if (Paths.IsEmpty())
@@ -253,7 +268,14 @@ void ATurret::SpawnProjectile(const FTransform& Transform)
 {
 	if (ProjectileLoaded == nullptr)
 	{
-		ProjectileLoaded = Projectile.LoadSynchronous();
+		if (Projectile)
+		{
+			ProjectileLoaded = Projectile.LoadSynchronous();
+		}
+		else
+		{
+			return;
+		}
 	}
 	
 	if (AProjectile* NewProjectile = GetWorld()->SpawnActorDeferred<AProjectile>(ProjectileLoaded, Transform, this, GetInstigator()))

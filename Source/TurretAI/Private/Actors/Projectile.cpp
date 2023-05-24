@@ -55,16 +55,22 @@ void AProjectile::LoadAssets()
 {
 	TArray<FSoftObjectPath> Paths;
 
-	HitParticleLoaded = HitParticle.Get();
-	if (HitParticleLoaded == nullptr)
+	if (HitParticle)
 	{
-		Paths.Add(HitParticle.ToSoftObjectPath());
+		HitParticleLoaded = HitParticle.Get();
+		if (HitParticleLoaded == nullptr)
+		{
+			Paths.Add(HitParticle.ToSoftObjectPath());
+		}
 	}
 
-	HitSoundLoaded = HitSound.Get();
-	if (HitSoundLoaded == nullptr)
+	if (HitSound)
 	{
-		Paths.Add(HitSound.ToSoftObjectPath());
+		HitSoundLoaded = HitSound.Get();
+		if (HitSoundLoaded == nullptr)
+		{
+			Paths.Add(HitSound.ToSoftObjectPath());
+		}
 	}
 
 	if (Paths.IsEmpty())
