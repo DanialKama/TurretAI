@@ -37,6 +37,16 @@ public:
 	/** Sets default values for this actor's properties */
 	AProjectile();
 
+	void SetFlag(const EProjectileAbility Flag)
+	{
+		ProjectileAbility |= static_cast<int32>(Flag);
+	}
+
+	bool HasFlag(const EProjectileAbility Flag) const
+	{
+		return (ProjectileAbility & static_cast<int32>(Flag)) == static_cast<int32>(Flag);
+	}
+
 protected:
 	/** Called when the game starts or when spawned */
 	virtual void BeginPlay() override;
