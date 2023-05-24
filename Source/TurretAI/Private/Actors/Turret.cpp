@@ -62,6 +62,8 @@ void ATurret::BeginPlay()
 
 	if (HasAuthority())
 	{
+		FindRandomRotation();
+		
 		HealthComp->Activate(false);
 		
 		Detector->SetGenerateOverlapEvents(true);
