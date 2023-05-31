@@ -18,6 +18,7 @@
 ATurret::ATurret()
 {
 	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bStartWithTickEnabled = false;
 	bReplicates = true;
 	NetUpdateFrequency = 5.0f;
 	
@@ -140,6 +141,7 @@ void ATurret::LoadAssets()
 
 	if (Paths.IsEmpty())
 	{
+		SetActorTickEnabled(true);
 		return;
 	}
 	
@@ -169,6 +171,8 @@ void ATurret::LoadAssets()
 		{
 			DestroySoundLoaded = DestroySound.Get();
 		}
+
+		SetActorTickEnabled(true);
 	}));
 }
 
@@ -272,14 +276,7 @@ void ATurret::SpawnProjectile(const FTransform& Transform)
 {
 	if (ProjectileLoaded == nullptr)
 	{
-		if (Projectile)
-		{
-			ProjectileLoaded = Projectile.LoadSynchronous();
-		}
-		else
-		{
-			return;
-		}
+		return;
 	}
 	
 	if (AProjectile* NewProjectile = GetWorld()->SpawnActorDeferred<AProjectile>(ProjectileLoaded, Transform, this, GetInstigator()))
