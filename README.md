@@ -9,5 +9,6 @@ You can access the demo and pictures of the project [here](https://danialkama.it
 If you have any questions or suggestions, please feel free to [message me](https://github.com/DanialKama#-connect-with-me).
 
 ## Credits
+- [Low Poly Shooter Pack](https://www.unrealengine.com/marketplace/en-US/product/low-poly-shooter-pack-free-sample)
 - [FX Variety Pack](https://www.unrealengine.com/marketplace/en-US/product/a36bac8b05004e999dd4b1d332501f49)
 - [FlatIcon](https://www.flaticon.com/)
