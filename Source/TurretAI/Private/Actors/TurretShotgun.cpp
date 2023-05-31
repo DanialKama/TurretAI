@@ -36,7 +36,6 @@ void ATurretShotgun::MulticastFireShotgunTurret_Implementation(const TArray<FRot
 	}
 	
 	FTransform NewTransform = BarrelMesh->GetSocketTransform("ProjectileSocket");
-	
 	for (FRotator NewRotation : Rotations)
 	{
 		NewTransform.SetRotation(NewRotation.Quaternion());

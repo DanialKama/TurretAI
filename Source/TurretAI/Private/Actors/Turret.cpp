@@ -152,22 +152,22 @@ void ATurret::LoadAssets()
 	
 		if (FireParticleLoaded == nullptr)
 		{
-			FireParticleLoaded = Cast<UNiagaraSystem>(FireParticle.Get());
+			FireParticleLoaded = FireParticle.Get();
 		}
 	
 		if (FireSoundLoaded == nullptr)
 		{
-			FireSoundLoaded = Cast<USoundBase>(FireSound.Get());
+			FireSoundLoaded = FireSound.Get();
 		}
 	
 		if (DestroyParticleLoaded == nullptr)
 		{
-			DestroyParticleLoaded = Cast<UNiagaraSystem>(DestroyParticle.Get());
+			DestroyParticleLoaded = DestroyParticle.Get();
 		}
 	
 		if (DestroySoundLoaded == nullptr)
 		{
-			DestroySoundLoaded = Cast<USoundBase>(DestroySound.Get());
+			DestroySoundLoaded = DestroySound.Get();
 		}
 	}));
 }
