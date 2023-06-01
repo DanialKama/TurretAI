@@ -42,6 +42,7 @@ ATurret::ATurret()
 	Detector->CanCharacterStepUpOn = ECB_No;
 	Detector->SetCollisionProfileName("Trigger");
 	Detector->SetCanEverAffectNavigation(false);
+	Detector->bUseAttachParentBound = true;
 
 	HealthComp = CreateDefaultSubobject<UHealthComponent>(TEXT("Health Component"));
 
