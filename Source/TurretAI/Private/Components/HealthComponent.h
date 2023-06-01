@@ -11,6 +11,7 @@ class TURRETAI_API UHealthComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
+// Functions
 public:
 	/** Sets default values for this component's properties */
 	UHealthComponent();
@@ -23,7 +24,7 @@ private:
 
 // Variables
 public:
-	UPROPERTY(EditAnywhere, Category = "Default", meta = (ClampMin = "0.0", UIMin = "0.0"))
+	UPROPERTY(EditAnywhere, Category = "Default", meta = (ClampMin = 0.0, UIMin = 0.0))
 	float DefaultHealth = 100.0f;
 
 private:

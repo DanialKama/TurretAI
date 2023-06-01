@@ -76,13 +76,13 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Projectile", meta = (AllowPrivateAccess = true))
 	TSoftObjectPtr<UNiagaraSystem> HitParticle;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Projectile", meta = (AllowPrivateAccess = true))
-	TSoftObjectPtr<USoundBase> HitSound;
 	
 	UPROPERTY()
 	UNiagaraSystem* HitParticleLoaded;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Projectile", meta = (AllowPrivateAccess = true))
+	TSoftObjectPtr<USoundBase> HitSound;
+	
 	UPROPERTY()
 	USoundBase* HitSoundLoaded;
 	

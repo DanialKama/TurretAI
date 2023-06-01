@@ -110,37 +110,37 @@ protected:
 private:
 	UPROPERTY(EditDefaultsOnly, Category = "Turret", meta = (AllowPrivateAccess = true))
 	TSoftClassPtr<class AProjectile> Projectile;
+	
+	UPROPERTY()
+	UClass* ProjectileLoaded;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Turret", meta = (AllowPrivateAccess = true))
 	TSoftObjectPtr<UNiagaraSystem> FireParticle;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Turret", meta = (AllowPrivateAccess = true))
-	TSoftObjectPtr<USoundBase> FireSound;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Turret", meta = (AllowPrivateAccess = true))
-	TSoftObjectPtr<UNiagaraSystem> DestroyParticle;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Turret", meta = (AllowPrivateAccess = true))
-	TSoftObjectPtr<USoundBase> DestroySound;
-
-	/** Target rotation that the turret will try to look at when there is no enemy */
-	UPROPERTY(Replicated)
-	FRotator RandomRotation = FRotator::ZeroRotator;
-
-	UPROPERTY()
-	UClass* ProjectileLoaded;
 	
 	UPROPERTY()
 	UNiagaraSystem* FireParticleLoaded;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Turret", meta = (AllowPrivateAccess = true))
+	TSoftObjectPtr<USoundBase> FireSound;
 	
 	UPROPERTY()
 	USoundBase* FireSoundLoaded;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Turret", meta = (AllowPrivateAccess = true))
+	TSoftObjectPtr<UNiagaraSystem> DestroyParticle;
 	
 	UPROPERTY()
 	UNiagaraSystem* DestroyParticleLoaded;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Turret", meta = (AllowPrivateAccess = true))
+	TSoftObjectPtr<USoundBase> DestroySound;
+	
 	UPROPERTY()
 	USoundBase* DestroySoundLoaded;
+
+	/** Target rotation that the turret will try to look at when there is no enemy */
+	UPROPERTY(Replicated)
+	FRotator RandomRotation = FRotator::ZeroRotator;
 
 	/** If set to True, the turret will try to find and look at a random rotation. */
 	uint8 bCanRotateRandomly : 1;

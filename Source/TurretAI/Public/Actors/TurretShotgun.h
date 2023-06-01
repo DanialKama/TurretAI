@@ -25,9 +25,9 @@ private:
 
 // Variables
 private:
-	UPROPERTY(EditDefaultsOnly, Category = "Turret", meta = (ClampMin = 1, UIMin = 1, AllowPrivateAccess = true))
+	UPROPERTY(EditDefaultsOnly, Category = "Turret", meta = (AllowPrivateAccess = true, ClampMin = 1, UIMin = 1))
 	uint8 NumOfShots = 3;
 	
-	UPROPERTY(EditDefaultsOnly, Category = "Turret", meta = (ClampMin = 0.0, UIMin = 0.0, AllowPrivateAccess = true))
+	UPROPERTY(EditDefaultsOnly, Category = "Turret", meta = (AllowPrivateAccess = true, ClampMin = 0.0, UIMin = 0.0))
 	float ShotgunSpread = 5.0f;
 };
