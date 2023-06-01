@@ -311,7 +311,7 @@ void ATurret::SpawnFireFX() const
 	SpawnParams.Scale = GetActorScale3D() + 0.5f;
 	UNiagaraFunctionLibrary::SpawnSystemAtLocationWithParams(SpawnParams);
 	
-	UGameplayStatics::SpawnSoundAtLocation(SpawnParams.WorldContextObject, FireSoundLoaded, SpawnParams.Location);
+	UGameplayStatics::SpawnSoundAtLocation(SpawnParams.WorldContextObject, FireSoundLoaded, SpawnParams.Location, SpawnParams.Rotation);
 }
 
 void ATurret::FindRandomRotation()
