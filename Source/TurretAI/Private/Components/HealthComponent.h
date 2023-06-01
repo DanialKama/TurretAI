@@ -27,10 +27,10 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Default", meta = (ClampMin = 0.0, UIMin = 0.0))
 	float DefaultHealth = 100.0f;
 
-private:
-	uint8 bIsAlive : 1;
-
 	float CurrentHealth = 0.0f;
 
-	class IGameplayInterface* GameplayInterface;
+private:
+	TScriptInterface<class IGameplayInterface> OwnerInterface;
+
+	uint8 bIsAlive : 1;
 };

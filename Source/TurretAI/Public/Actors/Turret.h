@@ -43,7 +43,7 @@ public:
 	virtual void Destroyed() override;
 
 	//~ Begin Gameplay Interface
-	virtual void HealthChanged(float NewHealth) override;
+	virtual void HealthChanged() override;
 	//~ End Gameplay Interface
 
 protected:

@@ -384,9 +384,9 @@ bool ATurret::CanHitTarget(AActor* Target) const
 	return false;
 }
 
-void ATurret::HealthChanged(float NewHealth)
+void ATurret::HealthChanged()
 {
-	if (NewHealth <= 0.0f)
+	if (HealthComp->CurrentHealth <= 0.0f)
 	{
 		Destroy();
 	}

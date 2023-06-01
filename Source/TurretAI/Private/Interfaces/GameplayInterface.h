@@ -23,5 +23,5 @@ class IGameplayInterface
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
 	/** The health component will call this after updating the current health amount */
-	virtual void HealthChanged(float NewHealth) {}
+	virtual void HealthChanged() {}
 };

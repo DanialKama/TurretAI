@@ -17,19 +17,25 @@ void UHealthComponent::Activate(bool bReset)
 {
 	Super::Activate(bReset);
 
-	GameplayInterface = Cast<IGameplayInterface>(GetOwner());
-
-	GetOwner()->OnTakeAnyDamage.AddDynamic(this, &UHealthComponent::OwnerTakeDamage);
+	if (IGameplayInterface* GameplayInterface = Cast<IGameplayInterface>(GetOwner()))
+	{
+		OwnerInterface.SetObject(GetOwner());
+		OwnerInterface.SetInterface(GameplayInterface);
+		
+		GetOwner()->OnTakeAnyDamage.AddDynamic(this, &UHealthComponent::OwnerTakeDamage);
+	}
 }
 
 void UHealthComponent::OwnerTakeDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser)
 {
-	if (bIsAlive)
+	if (bIsAlive == false)
 	{
-		const float NewHealth = FMath::Clamp(CurrentHealth - Damage, 0.0f, DefaultHealth);
-		
-		bIsAlive = NewHealth > 0.0f;
-
-		GameplayInterface->HealthChanged(NewHealth);
+		return;
 	}
+	
+	CurrentHealth -= Damage;
+	
+	bIsAlive = CurrentHealth > 0.0f;
+
+	OwnerInterface->HealthChanged();
 }
