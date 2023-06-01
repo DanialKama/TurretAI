@@ -94,7 +94,7 @@ void ATurret::LoadAssets()
 {
 	TArray<FSoftObjectPath> Paths;
 
-	if (Projectile)
+	if (Projectile.ToSoftObjectPath().IsValid())
 	{
 		ProjectileLoaded = Projectile.Get();
 		if (ProjectileLoaded == nullptr)
@@ -103,7 +103,7 @@ void ATurret::LoadAssets()
 		}
 	}
 
-	if (FireParticle)
+	if (FireParticle.ToSoftObjectPath().IsValid())
 	{
 		FireParticleLoaded = FireParticle.Get();
 		if (FireParticleLoaded == nullptr)
@@ -112,7 +112,7 @@ void ATurret::LoadAssets()
 		}
 	}
 
-	if (FireSound)
+	if (FireSound.ToSoftObjectPath().IsValid())
 	{
 		FireSoundLoaded = FireSound.Get();
 		if (FireSoundLoaded == nullptr)
@@ -121,7 +121,7 @@ void ATurret::LoadAssets()
 		}
 	}
 
-	if (DestroyParticle)
+	if (DestroyParticle.ToSoftObjectPath().IsValid())
 	{
 		DestroyParticleLoaded = DestroyParticle.Get();
 		if (DestroyParticleLoaded == nullptr)
@@ -130,7 +130,7 @@ void ATurret::LoadAssets()
 		}
 	}
 
-	if (DestroySound)
+	if (DestroySound.ToSoftObjectPath().IsValid())
 	{
 		DestroySoundLoaded = DestroySound.Get();
 		if (DestroySoundLoaded == nullptr)
