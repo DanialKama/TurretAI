@@ -18,23 +18,21 @@ enum EProjectileAbility
 /**
  * Base class for projectiles
  */
-UCLASS(meta = (DisplayName = "Projectile"))
+UCLASS(meta = (DisplayName = "Default"))
 class TURRETAI_API AProjectile : public AActor
 {
 	GENERATED_BODY()
-	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = true))
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<UStaticMeshComponent> ProjectileMesh;
-	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = true))
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<class UNiagaraComponent> TrailParticle;
-	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = true))
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<class UProjectileMovementComponent> ProjectileMovement;
 
-// Functions
 public:
-	/** Sets default values for this actor's properties */
 	AProjectile();
 
 	void SetFlag(const EProjectileAbility Flag)
@@ -48,12 +46,11 @@ public:
 	}
 
 protected:
-	/** Called when the game starts or when spawned */
 	virtual void BeginPlay() override;
 
 private:
 	void LoadAssets();
-	
+
 	UFUNCTION()
 	void ProjectileHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
@@ -63,7 +60,6 @@ private:
 	/** Disabling the projectile after hit and destroying it with a delay so trail particles have time to disappear */
 	void DisableProjectile();
 
-// Variables
 public:
 	TWeakObjectPtr<USceneComponent> HomingTarget;
 
@@ -71,20 +67,20 @@ public:
 
 private:
 	/** For non-explosive projectiles, only Base Damage is required */
-	UPROPERTY(EditDefaultsOnly, Category = "Projectile", meta = (AllowPrivateAccess = true))
+	UPROPERTY(EditDefaultsOnly, Category = "Default")
 	FRadialDamageParams DamageInfo;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Projectile", meta = (AllowPrivateAccess = true))
+	UPROPERTY(EditDefaultsOnly, Category = "Default")
 	TSoftObjectPtr<UNiagaraSystem> HitParticle;
-	
-	UPROPERTY()
-	UNiagaraSystem* HitParticleLoaded;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Projectile", meta = (AllowPrivateAccess = true))
+	UPROPERTY(Transient)
+	UNiagaraSystem* HitParticleLoaded = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Default")
 	TSoftObjectPtr<USoundBase> HitSound;
-	
-	UPROPERTY()
-	USoundBase* HitSoundLoaded;
-	
-	uint8 bDoOnceHit : 1;
+
+	UPROPERTY(Transient)
+	USoundBase* HitSoundLoaded = nullptr;
+
+	uint8 bDoOnceHit : 1 = true;
 };
