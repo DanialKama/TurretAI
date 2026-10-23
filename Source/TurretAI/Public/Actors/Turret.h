@@ -19,22 +19,22 @@ class TURRETAI_API ATurret : public AActor, public IGameplayInterface
 	GENERATED_BODY()
 
 protected:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = true))
+	UPROPERTY(VisibleAnywhere, Category = "Components")
 	TObjectPtr<UStaticMeshComponent> BaseMesh;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = true))
+	UPROPERTY(VisibleAnywhere, Category = "Components")
 	TObjectPtr<UStaticMeshComponent> BarrelMesh;
 
 private:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = true))
+	UPROPERTY(VisibleAnywhere, Category = "Components")
 	TObjectPtr<class USphereComponent> Detector;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = true))
+	UPROPERTY(VisibleAnywhere, Category = "Components")
 	TObjectPtr<class UHealthComponent> HealthComp;
 
 public:
 	ATurret();
-	
+
 	virtual void Tick(float DeltaTime) override;
 
 	virtual void Destroyed() override;
@@ -60,10 +60,12 @@ private:
 	void LoadAssets();
 
 	UFUNCTION()
-	void DetectorBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	void DetectorBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
+		int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 	UFUNCTION()
-	void DetectorEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+	void DetectorEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
+		int32 OtherBodyIndex);
 
 	/** On losing the current target, switch to another target if there is any. */
 	void FindNewTarget();
@@ -96,7 +98,7 @@ private:
 
 protected:
 	/** Turret info structure that stores the essential data to initialize the turret */
-	UPROPERTY(EditDefaultsOnly, Category = "Turret")
+	UPROPERTY(EditDefaultsOnly, Category = "Default")
 	FTurretInfo TurretInfo;
 
 	/** The current enemy that the turret try to shoot at it */
@@ -104,35 +106,35 @@ protected:
 	AActor* CurrentTarget;
 
 private:
-	UPROPERTY(EditDefaultsOnly, Category = "Turret", meta = (AllowPrivateAccess = true))
+	UPROPERTY(EditDefaultsOnly, Category = "Default")
 	TSoftClassPtr<class AProjectile> Projectile;
 
-	UPROPERTY()
-	UClass* ProjectileLoaded;
+	UPROPERTY(Transient)
+	UClass* ProjectileLoaded = nullptr;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Turret", meta = (AllowPrivateAccess = true))
+	UPROPERTY(EditDefaultsOnly, Category = "Default")
 	TSoftObjectPtr<UNiagaraSystem> FireParticle;
 
-	UPROPERTY()
-	UNiagaraSystem* FireParticleLoaded;
+	UPROPERTY(Transient)
+	UNiagaraSystem* FireParticleLoaded = nullptr;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Turret", meta = (AllowPrivateAccess = true))
+	UPROPERTY(EditDefaultsOnly, Category = "Default")
 	TSoftObjectPtr<USoundBase> FireSound;
 
-	UPROPERTY()
-	USoundBase* FireSoundLoaded;
+	UPROPERTY(Transient)
+	USoundBase* FireSoundLoaded = nullptr;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Turret", meta = (AllowPrivateAccess = true))
+	UPROPERTY(EditDefaultsOnly, Category = "Default")
 	TSoftObjectPtr<UNiagaraSystem> DestroyParticle;
 
-	UPROPERTY()
-	UNiagaraSystem* DestroyParticleLoaded;
+	UPROPERTY(Transient)
+	UNiagaraSystem* DestroyParticleLoaded = nullptr;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Turret", meta = (AllowPrivateAccess = true))
+	UPROPERTY(EditDefaultsOnly, Category = "Default")
 	TSoftObjectPtr<USoundBase> DestroySound;
 
-	UPROPERTY()
-	USoundBase* DestroySoundLoaded;
+	UPROPERTY(Transient)
+	USoundBase* DestroySoundLoaded = nullptr;
 
 	/** Target rotation that the turret will try to look at when there is no enemy */
 	UPROPERTY(Replicated)

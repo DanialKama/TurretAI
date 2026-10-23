@@ -9,12 +9,12 @@
 /**
  * This version of the turret includes a base, a turret, and barrel
  */
-UCLASS(Blueprintable, meta = (DisplayName = "Turret AI V2"))
+UCLASS(Abstract, Blueprintable, meta = (DisplayName = "Turret AI V2"))
 class TURRETAI_API ATurretV2 : public ATurret
 {
 	GENERATED_BODY()
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = true))
+	UPROPERTY(VisibleAnywhere, Category = "Components")
 	TObjectPtr<UStaticMeshComponent> TurretMesh;
 
 public:

@@ -9,7 +9,7 @@
 /**
  * This version of the turret includes a base and a barrel
  */
-UCLASS(Blueprintable, meta = (DisplayName = "Shotgun Turret AI V1"))
+UCLASS(Abstract, Blueprintable, meta = (DisplayName = "Shotgun Turret AI V1"))
 class TURRETAI_API ATurretShotgunV1 : public ATurretShotgun
 {
 	GENERATED_BODY()

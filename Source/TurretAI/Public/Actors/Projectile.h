@@ -18,18 +18,18 @@ enum EProjectileAbility
 /**
  * Base class for projectiles
  */
-UCLASS(meta = (DisplayName = "Default"))
+UCLASS(Abstract, meta = (DisplayName = "Default"))
 class TURRETAI_API AProjectile : public AActor
 {
 	GENERATED_BODY()
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	UPROPERTY(VisibleAnywhere, Category = "Components")
 	TObjectPtr<UStaticMeshComponent> ProjectileMesh;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	UPROPERTY(VisibleAnywhere, Category = "Components")
 	TObjectPtr<class UNiagaraComponent> TrailParticle;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	UPROPERTY(VisibleAnywhere, Category = "Components")
 	TObjectPtr<class UProjectileMovementComponent> ProjectileMovement;
 
 public:

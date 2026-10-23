@@ -9,12 +9,12 @@
 /**
  * This version of the turret includes a base, a turret, and barrel
  */
-UCLASS(Blueprintable, meta = (DisplayName = "Shotgun Turret AI V2"))
+UCLASS(Abstract, Blueprintable, meta = (DisplayName = "Shotgun Turret AI V2"))
 class TURRETAI_API ATurretShotgunV2 : public ATurretShotgun
 {
 	GENERATED_BODY()
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = true))
+	UPROPERTY(VisibleAnywhere, Category = "Components")
 	TObjectPtr<UStaticMeshComponent> TurretMesh;
 
 public:
