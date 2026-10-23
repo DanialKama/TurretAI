@@ -139,7 +139,7 @@ private:
 	FRotator RandomRotation = FRotator::ZeroRotator;
 
 	/** If set to True, the turret will try to find and look at a random rotation. */
-	uint8 bCanRotateRandomly : 1;
+	uint8 bCanRotateRandomly : 1 = true;
 
 	/** Used to call FireTurret() in a loop */
 	FTimerHandle FireTimer;

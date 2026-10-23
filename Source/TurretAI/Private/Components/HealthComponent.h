@@ -30,5 +30,5 @@ public:
 private:
 	TScriptInterface<class IGameplayInterface> OwnerInterface;
 
-	uint8 bIsAlive : 1;
+	uint8 bIsAlive : 1 = true;
 };

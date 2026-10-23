@@ -14,7 +14,6 @@ class TURRETAI_API ATurretShotgun : public ATurret
 {
 	GENERATED_BODY()
 
-// Functions
 protected:
 	virtual void HandleFireTurret() override;
 
@@ -23,11 +22,9 @@ private:
 	void MulticastFireShotgunTurret(const TArray<FRotator>& Rotations);
 	void MulticastFireShotgunTurret_Implementation(const TArray<FRotator>& Rotations);
 
-// Variables
-private:
 	UPROPERTY(EditDefaultsOnly, Category = "Turret", meta = (AllowPrivateAccess = true, ClampMin = 1, UIMin = 1))
 	uint8 NumOfShots = 3;
-	
+
 	UPROPERTY(EditDefaultsOnly, Category = "Turret", meta = (AllowPrivateAccess = true, ClampMin = 0.0, UIMin = 0.0))
 	float ShotgunSpread = 5.0f;
 };

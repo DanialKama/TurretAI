@@ -20,15 +20,12 @@ ADestroyedStructure::ADestroyedStructure()
 	StaticMesh->SetNotifyRigidBodyCollision(true);
 	StaticMesh->SetCanEverAffectNavigation(false);
 
-	// NOTE: You can create a new collision profile and use it
+	// NOTE: You can create a new collision profile and use that
 	StaticMesh->SetCollisionProfileName(UCollisionProfile::BlockAllDynamic_ProfileName);
 	StaticMesh->SetCollisionResponseToAllChannels(ECR_Ignore);
 	StaticMesh->SetCollisionResponseToChannel(ECC_Camera, ECR_Block);
 	StaticMesh->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
 	StaticMesh->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Block);
-
-	// Initialize variables
-	bDoOnceHit = true;
 }
 
 void ADestroyedStructure::Initialize(UStaticMesh* InMesh, TArray<UMaterialInterface*> Materials, const float InLinearDamping, const float InAngularDamping) const
@@ -58,8 +55,8 @@ void ADestroyedStructure::MeshHit(UPrimitiveComponent* HitComponent, AActor* Oth
 	bDoOnceHit = false;
 	StaticMesh->SetNotifyRigidBodyCollision(false);
 
-	const float Delay = GetLifeSpan() - 2.0f;
-	if (Delay > 0.0f)
+	if (const float Delay = GetLifeSpan() - 2.0f;
+		Delay > 0.0f)
 	{
 		FTimerHandle TimerHandle;
 		GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ADestroyedStructure::StartSink, Delay);

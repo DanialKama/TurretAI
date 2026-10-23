@@ -31,9 +31,6 @@ AProjectile::AProjectile()
 	TrailParticle->SetupAttachment(ProjectileMesh);
 
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("Projectile Movement"));
-	
-	// Initialize variables
-	bDoOnceHit = true;
 }
 
 void AProjectile::BeginPlay()

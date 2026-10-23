@@ -14,7 +14,6 @@ class TURRETAI_API ADestroyedStructure : public AActor
 	UPROPERTY()
 	TObjectPtr<UStaticMeshComponent> StaticMesh;
 
-// Functions
 public:
 	ADestroyedStructure();
 
@@ -26,7 +25,5 @@ private:
 
 	void StartSink() const;
 
-// Variables
-private:
-	uint8 bDoOnceHit : 1;
+	uint8 bDoOnceHit : 1 = true;
 };

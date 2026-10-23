@@ -14,8 +14,6 @@ class TURRETAI_API ATurretV1 : public ATurret
 {
 	GENERATED_BODY()
 
-// Functions
 public:
-	/** Called every frame */
 	virtual void Tick(float DeltaTime) override;
 };

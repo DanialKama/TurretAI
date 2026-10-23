@@ -8,7 +8,6 @@ UHealthComponent::UHealthComponent()
 {
 	PrimaryComponentTick.bStartWithTickEnabled = false;
 
-	bIsAlive = true;
 	CurrentHealth = DefaultHealth;
 }
 

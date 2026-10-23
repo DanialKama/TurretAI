@@ -12,11 +12,11 @@ ATurretV2::ATurretV2()
 	TurretMesh->SetGenerateOverlapEvents(false);
 	TurretMesh->CanCharacterStepUpOn = ECB_No;
 	TurretMesh->SetCanEverAffectNavigation(false);
-	
+
 	BarrelMesh->SetupAttachment(TurretMesh);
 }
 
-void ATurretV2::Tick(float DeltaTime)
+void ATurretV2::Tick(const float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
@@ -29,8 +29,8 @@ void ATurretV2::Tick(float DeltaTime)
 
 void ATurretV2::Destroyed()
 {
-	UWorld* MyWorld = GetWorld();
-	if (MyWorld->HasBegunPlay())
+	if (UWorld* MyWorld = GetWorld();
+		MyWorld->HasBegunPlay())
 	{
 		// Spawn the cannon turret
 		const ADestroyedStructure* NewStructure = Cast<ADestroyedStructure>(MyWorld->SpawnActor(ADestroyedStructure::StaticClass(), &TurretMesh->GetComponentTransform()));

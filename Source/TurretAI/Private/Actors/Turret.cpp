@@ -20,14 +20,14 @@ ATurret::ATurret()
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.bStartWithTickEnabled = false;
 	bReplicates = true;
-	NetUpdateFrequency = 5.0f;
-	
+	SetNetUpdateFrequency(5.0f);
+
 	BaseMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Base Mesh"));
 	RootComponent = BaseMesh;
 	BaseMesh->Mobility = EComponentMobility::Static;
 	BaseMesh->SetGenerateOverlapEvents(false);
 	BaseMesh->CanCharacterStepUpOn = ECB_No;
-	
+
 	BarrelMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Barrel Mesh"));
 	BarrelMesh->SetupAttachment(BaseMesh, "ConnectionSocket");
 	BarrelMesh->SetGenerateOverlapEvents(false);
@@ -45,9 +45,6 @@ ATurret::ATurret()
 	Detector->bUseAttachParentBound = true;
 
 	HealthComp = CreateDefaultSubobject<UHealthComponent>(TEXT("Health Component"));
-
-	// Initialize variables
-	bCanRotateRandomly = true;
 }
 
 void ATurret::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &OutLifetimeProps) const
