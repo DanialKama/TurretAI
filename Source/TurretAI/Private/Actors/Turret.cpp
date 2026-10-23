@@ -5,7 +5,6 @@
 #include "Actors/Projectile.h"
 #include "Components/SphereComponent.h"
 #include "DestroyedStructure.h"
-#include "KismetTraceUtils.h"
 #include "Engine/AssetManager.h"
 #include "Engine/CollisionProfile.h"
 #include "Engine/StreamableManager.h"
@@ -14,6 +13,10 @@
 #include "Net/UnrealNetwork.h"
 #include "NiagaraFunctionLibrary.h"
 #include "TimerManager.h"
+
+#if WITH_EDITOR
+#include "KismetTraceUtils.h"
+#endif
 
 ATurret::ATurret()
 {
