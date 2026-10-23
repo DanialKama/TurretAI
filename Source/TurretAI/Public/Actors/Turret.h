@@ -130,8 +130,8 @@ private:
 
 protected:
 	/** The current enemy that the turret try to shoot at it */
-	UPROPERTY(Replicated)
-	AActor* CurrentTarget;
+	UPROPERTY(Replicated, Transient)
+	AActor* CurrentTarget = nullptr;
 
 private:
 	UPROPERTY(EditDefaultsOnly, Category = "Default")

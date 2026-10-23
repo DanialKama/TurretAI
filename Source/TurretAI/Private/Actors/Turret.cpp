@@ -10,6 +10,7 @@
 #include "Engine/StreamableManager.h"
 #include "Engine/World.h"
 #include "Kismet/GameplayStatics.h"
+#include "Net/Core/PushModel/PushModel.h"
 #include "Net/UnrealNetwork.h"
 #include "NiagaraFunctionLibrary.h"
 #include "TimerManager.h"
@@ -52,8 +53,10 @@ void ATurret::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &OutLifetimeP
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME(ATurret, CurrentTarget);
-	DOREPLIFETIME(ATurret, RandomRotation);
+	FDoRepLifetimeParams Params;
+	Params.bIsPushBased = true;
+	DOREPLIFETIME_WITH_PARAMS_FAST(ATurret, CurrentTarget, Params);
+	DOREPLIFETIME_WITH_PARAMS_FAST(ATurret, RandomRotation, Params);
 }
 
 void ATurret::BeginPlay()
@@ -190,6 +193,7 @@ void ATurret::FindNewTarget()
 	GetWorld()->GetTimerManager().ClearTimer(SearchTimer);
 
 	CurrentTarget = nullptr;
+	MARK_PROPERTY_DIRTY_FROM_NAME(ATurret, CurrentTarget, this);
 
 	FindNewTargetImpl();
 
@@ -216,6 +220,8 @@ void ATurret::FindNewTargetImpl()
 		if (CanSeeTarget(NewTarget))
 		{
 			CurrentTarget = NewTarget;
+			MARK_PROPERTY_DIRTY_FROM_NAME(ATurret, CurrentTarget, this);
+
 			StartFireTurret();
 			return;
 		}
@@ -317,6 +323,7 @@ void ATurret::FindRandomRotation()
 	{
 		bCanRotateRandomly = true;
 		RandomRotation = FRotator(FMath::RandRange(MinPitch, MaxPitch), FMath::RandRange(-180.0f, 180.0f), 0.0f);
+		MARK_PROPERTY_DIRTY_FROM_NAME(ATurret, RandomRotation, this);
 	}
 	else
 	{
