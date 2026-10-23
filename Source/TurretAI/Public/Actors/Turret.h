@@ -21,23 +21,20 @@ class TURRETAI_API ATurret : public AActor, public IGameplayInterface
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = true))
 	TObjectPtr<UStaticMeshComponent> BaseMesh;
-	
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = true))
 	TObjectPtr<UStaticMeshComponent> BarrelMesh;
 
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = true))
 	TObjectPtr<class USphereComponent> Detector;
-	
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = true))
 	TObjectPtr<class UHealthComponent> HealthComp;
 
-// Functions
 public:
-	/** Sets default values for this actor's properties */
 	ATurret();
 	
-	/** Called every frame */
 	virtual void Tick(float DeltaTime) override;
 
 	virtual void Destroyed() override;
@@ -49,19 +46,19 @@ public:
 protected:
 	/** Called when the game starts or when spawned */
 	virtual void BeginPlay() override;
-	
+
 	virtual void HandleFireTurret();
 
 	void SpawnProjectile(const FTransform& Transform);
 
 	void SpawnFireFX() const;
-	
+
 	/** Calculating the target rotation so the turret will smoothly rotate toward the target */
 	FRotator CalculateRotation(const UStaticMeshComponent* CompToRotate, float DeltaTime) const;
-	
+
 private:
 	void LoadAssets();
-	
+
 	UFUNCTION()
 	void DetectorBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
@@ -79,14 +76,14 @@ private:
 
 	/** Handling firing the turret */
 	void FireTurret();
-	
+
 	UFUNCTION(NetMulticast, Unreliable)
 	void MulticastFireTurret();
 	void MulticastFireTurret_Implementation();
 
 	/** Finding a new random rotation for the turret to use when there is no enemy */
 	void FindRandomRotation();
-	
+
 	/** A simple test to make sure that the turret can see the target and target is not behind any cover */
 	bool CanSeeTarget(AActor* Target) const;
 
@@ -96,8 +93,7 @@ private:
 	* @return	True if the projectile can hit the target
 	*/
 	virtual bool CanHitTarget(AActor* Target) const;
-	
-// Variables
+
 protected:
 	/** Turret info structure that stores the essential data to initialize the turret */
 	UPROPERTY(EditDefaultsOnly, Category = "Turret")
@@ -110,31 +106,31 @@ protected:
 private:
 	UPROPERTY(EditDefaultsOnly, Category = "Turret", meta = (AllowPrivateAccess = true))
 	TSoftClassPtr<class AProjectile> Projectile;
-	
+
 	UPROPERTY()
 	UClass* ProjectileLoaded;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Turret", meta = (AllowPrivateAccess = true))
 	TSoftObjectPtr<UNiagaraSystem> FireParticle;
-	
+
 	UPROPERTY()
 	UNiagaraSystem* FireParticleLoaded;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Turret", meta = (AllowPrivateAccess = true))
 	TSoftObjectPtr<USoundBase> FireSound;
-	
+
 	UPROPERTY()
 	USoundBase* FireSoundLoaded;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Turret", meta = (AllowPrivateAccess = true))
 	TSoftObjectPtr<UNiagaraSystem> DestroyParticle;
-	
+
 	UPROPERTY()
 	UNiagaraSystem* DestroyParticleLoaded;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Turret", meta = (AllowPrivateAccess = true))
 	TSoftObjectPtr<USoundBase> DestroySound;
-	
+
 	UPROPERTY()
 	USoundBase* DestroySoundLoaded;
 
