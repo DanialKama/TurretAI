@@ -2,10 +2,10 @@
 
 #include "Actors/TurretShotgunV1.h"
 
-void ATurretShotgunV1::Tick(float DeltaTime)
+void ATurretShotgunV1::Tick(const float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	
+
 	const FRotator NewRotation = CalculateRotation(BarrelMesh, DeltaTime);
-	BarrelMesh->SetRelativeRotation(FRotator(FMath::ClampAngle(NewRotation.Pitch, TurretInfo.MinPitch, TurretInfo.MaxPitch), NewRotation.Yaw, 0.0f));
+	BarrelMesh->SetRelativeRotation(FRotator(FMath::ClampAngle(NewRotation.Pitch, MinPitch, MaxPitch), NewRotation.Yaw, 0.0f));
 }

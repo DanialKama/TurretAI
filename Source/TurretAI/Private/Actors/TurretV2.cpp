@@ -24,7 +24,7 @@ void ATurretV2::Tick(const float DeltaTime)
 	TurretMesh->SetRelativeRotation(FRotator(0.0f, NewRotation.Yaw, 0.0f));
 
 	NewRotation = CalculateRotation(BarrelMesh, DeltaTime);
-	BarrelMesh->SetRelativeRotation(FRotator(FMath::ClampAngle(NewRotation.Pitch, TurretInfo.MinPitch, TurretInfo.MaxPitch), 0.0f, 0.0f));
+	BarrelMesh->SetRelativeRotation(FRotator(FMath::ClampAngle(NewRotation.Pitch, MinPitch, MaxPitch), 0.0f, 0.0f));
 }
 
 void ATurretV2::Destroyed()

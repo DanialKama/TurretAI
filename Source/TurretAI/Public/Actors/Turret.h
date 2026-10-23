@@ -4,10 +4,18 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "Types/TurretTypes.h"
 #include "Turret.generated.h"
 
 class UNiagaraSystem;
+
+UENUM(meta = (Bitflags, UseEnumValuesAsMaskValuesInEditor = "true"))
+enum class ETurretAbility
+{
+	None			= 0x00	UMETA(Hidden),
+	ExplosiveShot	= 0x01,
+	Homing			= 0x02,
+};
+ENUM_CLASS_FLAGS(ETurretAbility);
 
 /**
  * Turret AI base class
@@ -53,7 +61,7 @@ protected:
 	void SpawnFireFX() const;
 
 	/** Calculating the target rotation so the turret will smoothly rotate toward the target */
-	FRotator CalculateRotation(const UStaticMeshComponent* CompToRotate, float DeltaTime) const;
+	FRotator CalculateRotation(const UStaticMeshComponent* CompToRotate, const float DeltaTime) const;
 
 private:
 	UFUNCTION()
@@ -94,10 +102,33 @@ private:
 	virtual bool CanHitTarget(AActor* Target) const;
 
 protected:
-	/** Turret info structure that stores the essential data to initialize the turret */
-	UPROPERTY(EditDefaultsOnly, Category = "Default")
-	FTurretInfo TurretInfo;
+	UPROPERTY(EditDefaultsOnly, Category = "Default", meta = (ClampMin = "0", UIMin = "0"))
+	float FireRate = 1.0f;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Default", meta = (ClampMin = "0", UIMin = "0"))
+	float MaxPitch = 45.0f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Default", meta = (ClampMax = "0", UIMax = "0"))
+	float MinPitch = -45.0f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Default", meta = (ClampMin = "0", UIMin = "0"))
+	float RotationSpeed = 100.0f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Default", meta = (Bitmask, BitmaskEnum = "/Script/TurretAI.ETurretAbility"))
+	int32 TurretAbility = 0;
+
+private:
+	void SetFlag(ETurretAbility Flag)
+	{
+		TurretAbility |= static_cast<int32>(Flag);
+	}
+
+	bool HasFlag(ETurretAbility Flag) const
+	{
+		return (TurretAbility & static_cast<int32>(Flag)) == static_cast<int32>(Flag);
+	}
+
+protected:
 	/** The current enemy that the turret try to shoot at it */
 	UPROPERTY(Replicated)
 	AActor* CurrentTarget;
@@ -148,4 +179,10 @@ private:
 
 public:
 	virtual void Destroyed() override;
+
+#if WITH_EDITORONLY_DATA
+private:
+	UPROPERTY(EditDefaultsOnly, Category = "Debug")
+	uint8 bDrawDebug:1 = false;
+#endif
 };
