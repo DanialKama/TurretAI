@@ -3,7 +3,6 @@
 #include "Actors/Turret.h"
 
 #include "Actors/Projectile.h"
-#include "Components/HealthComponent.h"
 #include "Components/SphereComponent.h"
 #include "DestroyedStructure.h"
 #include "Engine/AssetManager.h"
@@ -43,8 +42,6 @@ ATurret::ATurret()
 	Detector->SetCollisionProfileName("Trigger");
 	Detector->SetCanEverAffectNavigation(false);
 	Detector->bUseAttachParentBound = true;
-
-	HealthComp = CreateDefaultSubobject<UHealthComponent>(TEXT("Health Component"));
 }
 
 void ATurret::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &OutLifetimeProps) const
@@ -59,21 +56,85 @@ void ATurret::BeginPlay()
 {
 	Super::BeginPlay();
 
-	LoadAssets();
-
 	if (HasAuthority())
 	{
 		FindRandomRotation();
-		
-		HealthComp->Activate(false);
-		
+
 		Detector->SetGenerateOverlapEvents(true);
 		Detector->OnComponentBeginOverlap.AddDynamic(this, &ATurret::DetectorBeginOverlap);
 		Detector->OnComponentEndOverlap.AddDynamic(this, &ATurret::DetectorEndOverlap);
 	}
+
+	TArray<FSoftObjectPath> Paths;
+
+	ProjectileLoaded = Projectile.Get();
+	if (ProjectileLoaded == nullptr)
+	{
+		Paths.Add(Projectile.ToSoftObjectPath());
+	}
+
+	FireParticleLoaded = FireParticle.Get();
+	if (FireParticleLoaded == nullptr)
+	{
+		Paths.Add(FireParticle.ToSoftObjectPath());
+	}
+
+	FireSoundLoaded = FireSound.Get();
+	if (FireSoundLoaded == nullptr)
+	{
+		Paths.Add(FireSound.ToSoftObjectPath());
+	}
+
+	DestroyParticleLoaded = DestroyParticle.Get();
+	if (DestroyParticleLoaded == nullptr)
+	{
+		Paths.Add(DestroyParticle.ToSoftObjectPath());
+	}
+
+	DestroySoundLoaded = DestroySound.Get();
+	if (DestroySoundLoaded == nullptr)
+	{
+		Paths.Add(DestroySound.ToSoftObjectPath());
+	}
+
+	if (Paths.IsEmpty())
+	{
+		SetActorTickEnabled(true);
+		return;
+	}
+
+	UAssetManager::GetStreamableManager().RequestAsyncLoad(Paths, FStreamableDelegate::CreateWeakLambda(this, [this]
+	{
+		if (ProjectileLoaded == nullptr)
+		{
+			ProjectileLoaded = Projectile.Get();
+		}
+
+		if (FireParticleLoaded == nullptr)
+		{
+			FireParticleLoaded = FireParticle.Get();
+		}
+
+		if (FireSoundLoaded == nullptr)
+		{
+			FireSoundLoaded = FireSound.Get();
+		}
+
+		if (DestroyParticleLoaded == nullptr)
+		{
+			DestroyParticleLoaded = DestroyParticle.Get();
+		}
+
+		if (DestroySoundLoaded == nullptr)
+		{
+			DestroySoundLoaded = DestroySound.Get();
+		}
+
+		SetActorTickEnabled(true);
+	}));
 }
 
-void ATurret::Tick(float DeltaTime)
+void ATurret::Tick(const float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
@@ -88,90 +149,18 @@ void ATurret::Tick(float DeltaTime)
 	}
 }
 
-void ATurret::LoadAssets()
+float ATurret::TakeDamage(const float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,
+	AActor* DamageCauser)
 {
-	TArray<FSoftObjectPath> Paths;
+	const float NewDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
-	if (Projectile.ToSoftObjectPath().IsValid())
+	CurrentHealth -= NewDamage;
+	if (CurrentHealth <= 0.0f)
 	{
-		ProjectileLoaded = Projectile.Get();
-		if (ProjectileLoaded == nullptr)
-		{
-			Paths.Add(Projectile.ToSoftObjectPath());
-		}
+		Destroy();
 	}
 
-	if (FireParticle.ToSoftObjectPath().IsValid())
-	{
-		FireParticleLoaded = FireParticle.Get();
-		if (FireParticleLoaded == nullptr)
-		{
-			Paths.Add(FireParticle.ToSoftObjectPath());
-		}
-	}
-
-	if (FireSound.ToSoftObjectPath().IsValid())
-	{
-		FireSoundLoaded = FireSound.Get();
-		if (FireSoundLoaded == nullptr)
-		{
-			Paths.Add(FireSound.ToSoftObjectPath());
-		}
-	}
-
-	if (DestroyParticle.ToSoftObjectPath().IsValid())
-	{
-		DestroyParticleLoaded = DestroyParticle.Get();
-		if (DestroyParticleLoaded == nullptr)
-		{
-			Paths.Add(DestroyParticle.ToSoftObjectPath());
-		}
-	}
-
-	if (DestroySound.ToSoftObjectPath().IsValid())
-	{
-		DestroySoundLoaded = DestroySound.Get();
-		if (DestroySoundLoaded == nullptr)
-		{
-			Paths.Add(DestroySound.ToSoftObjectPath());
-		}
-	}
-
-	if (Paths.IsEmpty())
-	{
-		SetActorTickEnabled(true);
-		return;
-	}
-	
-	UAssetManager::GetStreamableManager().RequestAsyncLoad(Paths, FStreamableDelegate::CreateWeakLambda(this, [this]
-	{
-		if (ProjectileLoaded == nullptr)
-		{
-			ProjectileLoaded = Projectile.Get();
-		}
-	
-		if (FireParticleLoaded == nullptr)
-		{
-			FireParticleLoaded = FireParticle.Get();
-		}
-	
-		if (FireSoundLoaded == nullptr)
-		{
-			FireSoundLoaded = FireSound.Get();
-		}
-	
-		if (DestroyParticleLoaded == nullptr)
-		{
-			DestroyParticleLoaded = DestroyParticle.Get();
-		}
-	
-		if (DestroySoundLoaded == nullptr)
-		{
-			DestroySoundLoaded = DestroySound.Get();
-		}
-
-		SetActorTickEnabled(true);
-	}));
+	return NewDamage;
 }
 
 void ATurret::DetectorBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -182,6 +171,7 @@ void ATurret::DetectorBeginOverlap(UPrimitiveComponent* OverlappedComponent, AAc
 	}
 }
 
+// ReSharper disable once CppParameterMayBeConstPtrOrRef
 void ATurret::DetectorEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
 	if (OtherActor == CurrentTarget)
@@ -194,9 +184,9 @@ void ATurret::FindNewTarget()
 {
 	// Clear the search timer because we are starting a new search
 	GetWorld()->GetTimerManager().ClearTimer(SearchTimer);
-	
+
 	CurrentTarget = nullptr;
-	
+
 	FindNewTargetImpl();
 
 	// Only reset the random rotation if the turret is not switching between targets.
@@ -348,17 +338,17 @@ FRotator ATurret::CalculateRotation(const UStaticMeshComponent* CompToRotate, fl
 	return FMath::RInterpConstantTo(CompToRotate->GetRelativeRotation(), RandomRotation, DeltaTime, TurretInfo.RotationSpeed);
 }
 
-bool ATurret::CanSeeTarget(AActor* Target) const
+bool ATurret::CanSeeTarget(const AActor* Target) const
 {
 	FCollisionQueryParams CollisionParams;
 	CollisionParams.AddIgnoredActor(this);
-	
-	FHitResult HitResult;
-	if (GetWorld()->LineTraceSingleByProfile(HitResult, BaseMesh->GetSocketLocation("ConnectionSocket"), Target->GetActorLocation(), UCollisionProfile::Pawn_ProfileName, CollisionParams))
+
+	if (FHitResult HitResult;
+		GetWorld()->LineTraceSingleByProfile(HitResult, BaseMesh->GetSocketLocation("ConnectionSocket"), Target->GetActorLocation(), UCollisionProfile::Pawn_ProfileName, CollisionParams))
 	{
 		return HitResult.GetActor() == Target;
 	}
-	
+
 	return false;
 }
 
@@ -382,31 +372,23 @@ bool ATurret::CanHitTarget(AActor* Target) const
 	return false;
 }
 
-void ATurret::HealthChanged()
-{
-	if (HealthComp->CurrentHealth <= 0.0f)
-	{
-		Destroy();
-	}
-}
-
 void ATurret::Destroyed()
 {
-	UWorld* MyWorld = GetWorld();
-	if (MyWorld->HasBegunPlay())
+	if (UWorld* MyWorld = GetWorld();
+		MyWorld->HasBegunPlay())
 	{
 		FFXSystemSpawnParameters SpawnParams;
 		SpawnParams.WorldContextObject = MyWorld;
 		SpawnParams.SystemTemplate = DestroyParticleLoaded;
 		SpawnParams.Location = BaseMesh->GetSocketLocation("ConnectionSocket");
 		UNiagaraFunctionLibrary::SpawnSystemAtLocationWithParams(SpawnParams);
-		
+
 		UGameplayStatics::SpawnSoundAtLocation(MyWorld, DestroySoundLoaded, BaseMesh->GetComponentLocation());
-		
+
 		// Spawn the turret base
 		const ADestroyedStructure* NewStructure = Cast<ADestroyedStructure>(MyWorld->SpawnActor(ADestroyedStructure::StaticClass(), &BaseMesh->GetComponentTransform()));
 		NewStructure->Initialize(BaseMesh->GetStaticMesh(), BaseMesh->GetMaterials(), BaseMesh->GetLinearDamping(), BaseMesh->GetAngularDamping());
-	
+
 		// Spawn the turret barrel
 		NewStructure = Cast<ADestroyedStructure>(MyWorld->SpawnActor(ADestroyedStructure::StaticClass(), &BarrelMesh->GetComponentTransform()));
 		NewStructure->Initialize(BarrelMesh->GetStaticMesh(), BarrelMesh->GetMaterials(), BarrelMesh->GetLinearDamping(), BarrelMesh->GetAngularDamping());

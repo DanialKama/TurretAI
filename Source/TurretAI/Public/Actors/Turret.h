@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "Interfaces/GameplayInterface.h"
 #include "Types/TurretTypes.h"
 #include "Turret.generated.h"
 
@@ -14,7 +13,7 @@ class UNiagaraSystem;
  * Turret AI base class
  */
 UCLASS(Abstract, NotBlueprintable, meta = (DisplayName = "Turret AI"))
-class TURRETAI_API ATurret : public AActor, public IGameplayInterface
+class TURRETAI_API ATurret : public AActor
 {
 	GENERATED_BODY()
 
@@ -29,24 +28,24 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	TObjectPtr<class USphereComponent> Detector;
 
-	UPROPERTY(VisibleAnywhere, Category = "Components")
-	TObjectPtr<class UHealthComponent> HealthComp;
-
 public:
 	ATurret();
-
-	virtual void Tick(float DeltaTime) override;
-
-	virtual void Destroyed() override;
-
-	//~ Begin Gameplay Interface
-	virtual void HealthChanged() override;
-	//~ End Gameplay Interface
 
 protected:
 	/** Called when the game starts or when spawned */
 	virtual void BeginPlay() override;
 
+public:
+	virtual void Tick(float DeltaTime) override;
+
+	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,
+		AActor* DamageCauser) override;
+
+private:
+	UPROPERTY(EditAnywhere, Category = "Default", meta = (ClampMin = "0", UIMin = "0"))
+	float CurrentHealth = 100.0f;
+
+protected:
 	virtual void HandleFireTurret();
 
 	void SpawnProjectile(const FTransform& Transform);
@@ -57,8 +56,6 @@ protected:
 	FRotator CalculateRotation(const UStaticMeshComponent* CompToRotate, float DeltaTime) const;
 
 private:
-	void LoadAssets();
-
 	UFUNCTION()
 	void DetectorBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
 		int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
@@ -87,7 +84,7 @@ private:
 	void FindRandomRotation();
 
 	/** A simple test to make sure that the turret can see the target and target is not behind any cover */
-	bool CanSeeTarget(AActor* Target) const;
+	bool CanSeeTarget(const AActor* Target) const;
 
 	/**
 	* Checking the target state and see that can projectile hit the target
@@ -148,4 +145,7 @@ private:
 
 	/** FindNewTarget() start this timer to recheck for a new target */
 	FTimerHandle SearchTimer;
+
+public:
+	virtual void Destroyed() override;
 };
