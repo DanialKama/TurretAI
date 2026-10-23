@@ -386,7 +386,7 @@ void ATurret::Destroyed()
 		UGameplayStatics::SpawnSoundAtLocation(MyWorld, DestroySoundLoaded, BaseMesh->GetComponentLocation());
 
 		// Spawn the turret base
-		const ADestroyedStructure* NewStructure = Cast<ADestroyedStructure>(MyWorld->SpawnActor(ADestroyedStructure::StaticClass(), &BaseMesh->GetComponentTransform()));
+		ADestroyedStructure* NewStructure = Cast<ADestroyedStructure>(MyWorld->SpawnActor(ADestroyedStructure::StaticClass(), &BaseMesh->GetComponentTransform()));
 		NewStructure->Initialize(BaseMesh->GetStaticMesh(), BaseMesh->GetMaterials(), BaseMesh->GetLinearDamping(), BaseMesh->GetAngularDamping());
 
 		// Spawn the turret barrel

@@ -17,11 +17,13 @@ class TURRETAI_API ADestroyedStructure : public AActor
 public:
 	ADestroyedStructure();
 
-	void Initialize(UStaticMesh* InMesh, TArray<UMaterialInterface*> Materials, const float InLinearDamping, const float InAngularDamping) const;
+	void Initialize(UStaticMesh* InMesh, TArray<UMaterialInterface*> Materials, const float InLinearDamping,
+		const float InAngularDamping);
 
 private:
 	UFUNCTION()
-	void MeshHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+	void MeshHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
+		FVector NormalImpulse, const FHitResult& Hit);
 
 	void StartSink() const;
 

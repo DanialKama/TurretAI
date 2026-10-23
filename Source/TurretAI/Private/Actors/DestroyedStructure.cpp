@@ -28,7 +28,8 @@ ADestroyedStructure::ADestroyedStructure()
 	StaticMesh->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Block);
 }
 
-void ADestroyedStructure::Initialize(UStaticMesh* InMesh, TArray<UMaterialInterface*> Materials, const float InLinearDamping, const float InAngularDamping) const
+void ADestroyedStructure::Initialize(UStaticMesh* InMesh, TArray<UMaterialInterface*> Materials, const float InLinearDamping,
+	const float InAngularDamping)
 {
 	StaticMesh->SetStaticMesh(InMesh);
 
@@ -39,19 +40,18 @@ void ADestroyedStructure::Initialize(UStaticMesh* InMesh, TArray<UMaterialInterf
 
 	StaticMesh->SetLinearDamping(InLinearDamping);
 	StaticMesh->SetAngularDamping(InAngularDamping);
-
 	StaticMesh->SetSimulatePhysics(true);
-
 	StaticMesh->OnComponentHit.AddDynamic(this, &ADestroyedStructure::MeshHit);
 }
 
-void ADestroyedStructure::MeshHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+void ADestroyedStructure::MeshHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
+	FVector NormalImpulse, const FHitResult& Hit)
 {
 	if (bDoOnceHit == false)
 	{
 		return;
 	}
-	
+
 	bDoOnceHit = false;
 	StaticMesh->SetNotifyRigidBodyCollision(false);
 
