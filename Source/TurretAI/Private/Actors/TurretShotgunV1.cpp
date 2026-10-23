@@ -1,4 +1,4 @@
-// Copyright 2023 Danial Kamali. All Rights Reserved.
+// Copyright 2026 Danial Kamali. All Rights Reserved.
 
 #include "Actors/TurretShotgunV1.h"
 
